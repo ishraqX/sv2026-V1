@@ -1,0 +1,909 @@
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  hero.css — Sound Vision · Hero Section                     ║
+   ║  Full-bleed large image · Cinematic dark luxury aesthetic   ║
+   ╚══════════════════════════════════════════════════════════════╝
+
+   NAMESPACE: hr-  (no collision with sv-tm- / sv-aw- / sv-bb-)
+
+   ┌──────────────────────────────────────────────────────────────┐
+   │  QUICK CUSTOMISATION GUIDE                                   │
+   ├──────────────────────────────────────────────────────────────┤
+   │                                                              │
+   │  HERO HEIGHT:                                                │
+   │  Change --hr-height (default: 100dvh = full viewport).       │
+   │  Examples:                                                   │
+   │    --hr-height: 100dvh    → full screen (default)            │
+   │    --hr-height: 90vh      → 90% of screen                   │
+   │    --hr-height: 800px     → fixed 800 px                    │
+   │                                                              │
+   │  IMAGE FOCAL POINT (which part of image shows):              │
+   │  Change --hr-img-pos:                                        │
+   │    center center   → default                                 │
+   │    center top      → shows top of image (sky, faces)         │
+   │    right center    → shows right side of image               │
+   │    center 30%      → 30% from the top                        │
+   │                                                              │
+   │  OVERLAY DARKNESS (how much the image is dimmed):            │
+   │  Change --hr-overlay-opacity (0 = transparent, 1 = black):  │
+   │    0.45  → light dim  (bright images)                        │
+   │    0.62  → default                                           │
+   │    0.78  → heavy dim  (light/busy images)                    │
+   │                                                              │
+   │  KEN BURNS EFFECT (subtle image zoom while displayed):       │
+   │  To disable: set --hr-kenburns-scale to 1                    │
+   │    --hr-kenburns-scale: 1.0   → no zoom (disabled)           │
+   │    --hr-kenburns-scale: 1.06  → default gentle zoom          │
+   │    --hr-kenburns-scale: 1.12  → stronger zoom                │
+   │                                                              │
+   │  SLIDE TRANSITION SPEED:                                     │
+   │  Change --hr-transition (default: 0.9s)                      │
+   │                                                              │
+   │  AUTO-PLAY INTERVAL:                                         │
+   │  Change in hero.js → AUTOPLAY_MS (default: 6000 = 6s)        │
+   │                                                              │
+   └──────────────────────────────────────────────────────────────┘ */
+
+
+/* ══════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+   ══════════════════════════════════════════════════════════════ */
+:root {
+    /* ── Hero dimensions ───────────────────────────────────────
+       Change --hr-height to resize the hero section.
+       dvh = dynamic viewport height (handles mobile browser bars).
+       Use vh as fallback for older browsers.                   */
+    --hr-height:       100dvh;
+    --hr-min-height:   620px;   /* never shorter than this */
+    --hr-max-height:   1100px;  /* cap on very tall screens */
+
+    /* ── Image behaviour ───────────────────────────────────────
+       --hr-img-pos controls which part of the image is visible.
+       See guide at top of file for examples.                   */
+    --hr-img-pos:      center center;
+
+    /* ── Ken Burns: subtle zoom while slide is displayed ───────
+       Set to 1 to disable. See guide for options.             */
+    --hr-kenburns-scale: 1.06;
+    --hr-kenburns-dur:   8s;
+
+    /* ── Overlay: dims the image so text is readable ────────────
+       0 = transparent · 1 = fully black.
+       Increase if your images are bright / busy.               */
+    --hr-overlay-opacity: 0.62;
+
+    /* ── Slide transition ──────────────────────────────────────
+       Duration of the cross-fade between slides.               */
+    --hr-transition: 0.9s;
+
+    /* ── Brand palette ─────────────────────────────────────────
+       Gold accent + dark backgrounds matching the site system. */
+    --hr-gold:         #D4AF37;
+    --hr-gold-lt:      #F5E27A;
+    --hr-gold-dk:      #A8820A;
+    --hr-gold-dim:     rgba(212,175,55,0.14);
+    --hr-gold-glow:    rgba(212,175,55,0.30);
+
+    --hr-white:        #FFFFFF;
+    --hr-text:         #EEE8D5;
+    --hr-text-soft:    rgba(238,232,213,0.72);
+    --hr-text-muted:   rgba(238,232,213,0.45);
+
+    /* ── Typography ─────────────────────────────────────────── */
+    --hr-font-disp:    'Cormorant Garamond', Georgia, serif;
+    --hr-font-body:    'DM Sans', system-ui, sans-serif;
+
+    /* ── Easing ─────────────────────────────────────────────── */
+    --hr-ease:         cubic-bezier(0.4, 0, 0.2, 1);
+    --hr-spring:       cubic-bezier(0.34, 1.56, 0.64, 1);
+    --hr-out:          cubic-bezier(0, 0, 0.2, 1);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   RESET (scoped to hero only)
+   ══════════════════════════════════════════════════════════════ */
+.hr-section *,
+.hr-section *::before,
+.hr-section *::after {
+    box-sizing: border-box;
+    margin:     0;
+    padding:    0;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   HERO SECTION WRAPPER
+   ══════════════════════════════════════════════════════════════ */
+.hr-section {
+    position:   relative;
+    width:      100%;
+
+    /* ── HEIGHT CONTROL ─────────────────────────────────────────
+       Change --hr-height, --hr-min-height, --hr-max-height
+       at the top of this file to resize.                       */
+    height:     var(--hr-height);
+    min-height: var(--hr-min-height);
+    max-height: var(--hr-max-height);
+
+    overflow:   hidden;
+    isolation:  isolate;
+    font-family: var(--hr-font-body);
+    color:       var(--hr-text);
+    /* Remove margin-top if your nav is not fixed. Add it back if
+       your navbar overlaps the hero (e.g. margin-top: 70px)    */
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   AMBIENT PARTICLES (JS-generated gold dots)
+   ══════════════════════════════════════════════════════════════ */
+.hr-particles {
+    position:       absolute;
+    inset:          0;
+    pointer-events: none;
+    z-index:        2;
+    overflow:       hidden;
+}
+
+/* Each particle element gets this class via JS */
+.hr-ptcl {
+    position:      absolute;
+    border-radius: 50%;
+    background:    var(--hr-gold);
+    pointer-events: none;
+    animation:     hr-ptcl-rise linear infinite;
+}
+
+@keyframes hr-ptcl-rise {
+    0%   { transform: translateY(108%) translateX(0);              opacity: 0;   }
+    8%   {                                                          opacity: 0.6; }
+    90%  {                                                          opacity: 0.2; }
+    100% { transform: translateY(-6%) translateX(var(--hr-dx, 0)); opacity: 0;   }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SLIDE TRACK
+   ══════════════════════════════════════════════════════════════ */
+.hr-track {
+    position: relative;
+    width:    100%;
+    height:   100%;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   INDIVIDUAL SLIDE
+   ══════════════════════════════════════════════════════════════ */
+.hr-slide {
+    position: absolute;
+    inset:    0;
+    opacity:  0;
+
+    /* Slide transition — change --hr-transition to adjust speed */
+    transition: opacity var(--hr-transition) var(--hr-ease);
+
+    pointer-events: none;   /* prevent interaction on hidden slides */
+}
+
+.hr-slide--active {
+    opacity:        1;
+    z-index:        1;
+    pointer-events: auto;
+}
+
+/* Slide that just left — stays briefly visible during cross-fade */
+.hr-slide--prev {
+    opacity: 0;
+    z-index: 0;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   HERO IMAGE (full-bleed, fills entire slide)
+   ══════════════════════════════════════════════════════════════ */
+.hr-img-wrap {
+    position: absolute;
+    inset:    0;
+    z-index:  0;
+    overflow: hidden;
+}
+
+/*
+   THE MAIN HERO IMAGE
+   ──────────────────────────────────────────────────────────────
+   object-fit: cover  → image always fills the container,
+                         cropping at the edges if needed.
+   object-position    → controlled by --hr-img-pos token.
+                         Change it to shift the focal point.
+   ──────────────────────────────────────────────────────────────
+   IMAGE SIZE NOTE:
+   Recommended: 1920 × 1080 px (JPG/WebP, < 600 KB compressed).
+   The image will be stretched/cropped to always fill the viewport.
+   Very tall narrow images (portrait) will be heavily cropped on
+   desktop — use landscape images for best results.
+*/
+.hr-img {
+    position:        absolute;
+    inset:           0;
+    width:           100%;
+    height:          100%;
+    object-fit:      cover;
+    object-position: var(--hr-img-pos);   /* ← change focal point in :root */
+    display:         block;
+    user-select:     none;
+    pointer-events:  none;
+
+    /* Ken Burns — subtle zoom while slide is active.
+       Disable by setting --hr-kenburns-scale: 1 in :root. */
+    transform:         scale(1);
+    transform-origin:  center center;
+    transition:        transform calc(var(--hr-kenburns-dur) * 1.2) linear;
+}
+
+/* Image zooms slowly while slide is active (Ken Burns) */
+.hr-slide--active .hr-img {
+    transform: scale(var(--hr-kenburns-scale));
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   OVERLAY SYSTEM
+   Dims the image so white text remains readable.
+   ══════════════════════════════════════════════════════════════ */
+
+/*
+   BASE OVERLAY
+   ──────────────────────────────────────────────────────────────
+   Gradient: stronger on the left (where text lives), fades right.
+   Increase --hr-overlay-opacity in :root to make it darker.
+   ──────────────────────────────────────────────────────────────
+*/
+.hr-overlay {
+    position: absolute;
+    inset:    0;
+    z-index:  1;
+    background: linear-gradient(
+        105deg,
+        rgba(0,0,0, var(--hr-overlay-opacity)) 0%,
+        rgba(0,0,0, calc(var(--hr-overlay-opacity) * 0.80)) 40%,
+        rgba(0,0,0, calc(var(--hr-overlay-opacity) * 0.35)) 75%,
+        rgba(0,0,0, 0.05) 100%
+    );
+}
+
+/* Slide 2 — teal-tinted overlay */
+.hr-overlay--teal {
+    background: linear-gradient(
+        105deg,
+        rgba(0,25,30, calc(var(--hr-overlay-opacity) * 1.05)) 0%,
+        rgba(0,20,25, calc(var(--hr-overlay-opacity) * 0.85)) 45%,
+        rgba(0,15,20, calc(var(--hr-overlay-opacity) * 0.35)) 75%,
+        rgba(0,10,14, 0.05) 100%
+    );
+}
+
+/* Slide 3 — forest-tinted overlay */
+.hr-overlay--green {
+    background: linear-gradient(
+        105deg,
+        rgba(5,20,5, calc(var(--hr-overlay-opacity) * 1.05)) 0%,
+        rgba(3,16,4, calc(var(--hr-overlay-opacity) * 0.85)) 45%,
+        rgba(2,12,3, calc(var(--hr-overlay-opacity) * 0.35)) 75%,
+        rgba(0,8,1,  0.05) 100%
+    );
+}
+
+/* Cinematic vignette — darkens edges for depth */
+.hr-vignette {
+    position: absolute;
+    inset:    0;
+    z-index:  2;
+    background: radial-gradient(
+        ellipse at center,
+        transparent 50%,
+        rgba(0,0,0,0.45) 100%
+    );
+    pointer-events: none;
+}
+
+/* Bottom gradient — blends hero smoothly into next section */
+.hr-section::after {
+    content:  '';
+    position: absolute;
+    bottom:   0;
+    left:     0;
+    right:    0;
+    height:   160px;
+    background: linear-gradient(to bottom, transparent, rgba(5,7,14,0.92));
+    z-index:  3;
+    pointer-events: none;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SLIDE CONTENT (text panel)
+   Positioned left-centre over the image.
+   ══════════════════════════════════════════════════════════════ */
+.hr-content {
+    position: absolute;
+    inset:    0;
+    z-index:  4;
+    display:  flex;
+    flex-direction: column;
+    justify-content: center;
+
+    /* Left-side padding — keeps text away from very left edge */
+    padding: 0 0 60px 8%;
+
+    /* Content enters from below when slide activates */
+    opacity:   0;
+    transform: translateY(30px);
+    transition:
+        opacity   0.8s var(--hr-ease) calc(var(--hr-transition) * 0.3),
+        transform 0.9s var(--hr-out)  calc(var(--hr-transition) * 0.3);
+}
+
+.hr-slide--active .hr-content {
+    opacity:   1;
+    transform: translateY(0);
+}
+
+/* Limit text width so it doesn't span the full screen */
+.hr-content > * {
+    max-width: 640px;
+}
+
+
+/* ── Eyebrow tag ─────────────────────────────────────────────── */
+.hr-eyebrow {
+    display:     flex;
+    align-items: center;
+    gap:         12px;
+    margin-bottom: 22px;
+
+    opacity:   0;
+    transform: translateY(18px);
+    transition: opacity 0.7s var(--hr-out) calc(var(--hr-transition) * 0.6),
+                transform 0.7s var(--hr-out) calc(var(--hr-transition) * 0.6);
+}
+.hr-slide--active .hr-eyebrow {
+    opacity:   1;
+    transform: translateY(0);
+}
+
+.hr-eyebrow-dot {
+    display:       block;
+    width:         8px;
+    height:        8px;
+    border-radius: 50%;
+    background:    var(--hr-gold);
+    flex-shrink:   0;
+    box-shadow:    0 0 8px var(--hr-gold-glow);
+    animation:     hr-dot-pulse 2.5s ease-in-out infinite;
+}
+@keyframes hr-dot-pulse {
+    0%,100% { box-shadow: 0 0 6px var(--hr-gold-glow);  }
+    50%      { box-shadow: 0 0 16px var(--hr-gold-glow); }
+}
+
+.hr-eyebrow-text {
+    font-family:    var(--hr-font-body);
+    font-size:      11px;
+    font-weight:    600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color:          var(--hr-gold);
+    white-space:    nowrap;
+}
+
+.hr-eyebrow-line {
+    display:    block;
+    flex:       1;
+    max-width:  60px;
+    height:     1px;
+    background: linear-gradient(90deg, var(--hr-gold), transparent);
+    opacity:    0.5;
+}
+
+
+/* ── Main headline ───────────────────────────────────────────── */
+.hr-title {
+    font-family:    var(--hr-font-disp);
+    font-size:      clamp(52px, 7vw, 96px);
+    font-weight:    700;
+    line-height:    1.02;
+    letter-spacing: -1.5px;
+    color:          var(--hr-white);
+    margin-bottom:  22px;
+    text-shadow:    0 2px 32px rgba(0,0,0,0.4);
+
+    opacity:   0;
+    transform: translateY(24px);
+    transition: opacity 0.8s var(--hr-out)  calc(var(--hr-transition) * 0.7),
+                transform 0.9s var(--hr-out) calc(var(--hr-transition) * 0.7);
+}
+.hr-slide--active .hr-title {
+    opacity:   1;
+    transform: translateY(0);
+}
+
+/* Gold italic accent word inside the headline */
+.hr-title-em {
+    font-style: italic;
+    font-weight: 700;
+    background: linear-gradient(
+        135deg,
+        var(--hr-gold-lt) 0%,
+        var(--hr-gold)    45%,
+        var(--hr-gold-dk) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip:         text;
+    display:                 inline;
+    position:                relative;
+}
+
+/* Animated underline beneath the gold word */
+.hr-title-em::after {
+    content:    '';
+    position:   absolute;
+    left: 0; right: 0;
+    bottom:     4px;
+    height:     3px;
+    background: linear-gradient(90deg, var(--hr-gold-lt), var(--hr-gold), transparent);
+    border-radius: 99px;
+    animation:  hr-ul 3s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes hr-ul {
+    0%,100% { opacity: 0.4; transform: scaleX(0.88); }
+    50%      { opacity: 0.9; transform: scaleX(1);    }
+}
+
+
+/* ── Sub-headline ────────────────────────────────────────────── */
+.hr-sub {
+    font-family:  var(--hr-font-body);
+    font-size:    clamp(15px, 1.8vw, 19px);
+    font-weight:  300;
+    line-height:  1.75;
+    color:        var(--hr-text-soft);
+    margin-bottom: 36px;
+    max-width:    520px;
+
+    opacity:   0;
+    transform: translateY(20px);
+    transition: opacity 0.8s var(--hr-out)  calc(var(--hr-transition) * 0.85),
+                transform 0.9s var(--hr-out) calc(var(--hr-transition) * 0.85);
+}
+.hr-slide--active .hr-sub {
+    opacity:   1;
+    transform: translateY(0);
+}
+
+
+/* ── CTA Buttons ─────────────────────────────────────────────── */
+.hr-btns {
+    display:     flex;
+    align-items: center;
+    gap:         16px;
+    flex-wrap:   wrap;
+    margin-bottom: 40px;
+
+    opacity:   0;
+    transform: translateY(18px);
+    transition: opacity 0.8s var(--hr-out)  calc(var(--hr-transition) * 1.0),
+                transform 0.9s var(--hr-out) calc(var(--hr-transition) * 1.0);
+}
+.hr-slide--active .hr-btns {
+    opacity:   1;
+    transform: translateY(0);
+}
+
+/* Shared button base */
+.hr-btn {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             10px;
+    padding:         16px 32px;
+    border-radius:   999px;
+    font-family:     var(--hr-font-body);
+    font-size:       14px;
+    font-weight:     600;
+    letter-spacing:  0.4px;
+    text-decoration: none;
+    white-space:     nowrap;
+    cursor:          pointer;
+    transition:      all 0.3s var(--hr-spring);
+    position:        relative;
+    overflow:        hidden;
+}
+
+/* Primary — gold filled */
+.hr-btn--primary {
+    background: linear-gradient(135deg, var(--hr-gold-lt), var(--hr-gold));
+    color:      #0A0800;
+    box-shadow: 0 4px 24px rgba(212,175,55,0.38),
+                0 1px 4px rgba(0,0,0,0.3);
+}
+.hr-btn--primary:hover {
+    transform:  translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(212,175,55,0.55),
+                0 2px 8px rgba(0,0,0,0.4);
+}
+.hr-btn--primary i { font-size: 13px; transition: transform 0.25s var(--hr-spring); }
+.hr-btn--primary:hover i { transform: translateX(4px); }
+
+/* Shimmer sweep on primary button hover */
+.hr-btn--primary::after {
+    content:    '';
+    position:   absolute;
+    inset:      0;
+    background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.22) 50%, transparent 70%);
+    transform:  translateX(-120%);
+    pointer-events: none;
+}
+.hr-btn--primary:hover::after {
+    animation: hr-btn-shimmer 0.55s var(--hr-ease) forwards;
+}
+@keyframes hr-btn-shimmer {
+    from { transform: translateX(-120%); }
+    to   { transform: translateX(120%);  }
+}
+
+/* Ghost — frosted glass outline */
+.hr-btn--ghost {
+    background:      rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    border:          1px solid rgba(255,255,255,0.20);
+    color:           var(--hr-white);
+}
+.hr-btn--ghost:hover {
+    background:   rgba(255,255,255,0.16);
+    border-color: rgba(212,175,55,0.50);
+    color:        var(--hr-gold-lt);
+    transform:    translateY(-3px);
+    box-shadow:   0 6px 24px rgba(0,0,0,0.3);
+}
+
+
+/* ── Floating stat chips ─────────────────────────────────────── */
+.hr-chips {
+    display:   flex;
+    gap:       12px;
+    flex-wrap: wrap;
+
+    opacity:   0;
+    transform: translateY(16px);
+    transition: opacity 0.8s var(--hr-out)  calc(var(--hr-transition) * 1.15),
+                transform 0.9s var(--hr-out) calc(var(--hr-transition) * 1.15);
+}
+.hr-slide--active .hr-chips {
+    opacity:   1;
+    transform: translateY(0);
+}
+
+.hr-chip {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             8px;
+    padding:         8px 16px;
+    border-radius:   999px;
+    background:      rgba(255,255,255,0.07);
+    backdrop-filter: blur(10px);
+    border:          1px solid rgba(255,255,255,0.12);
+    font-size:       12px;
+    font-weight:     500;
+    color:           var(--hr-text-soft);
+    white-space:     nowrap;
+    transition:      all 0.3s var(--hr-ease);
+}
+.hr-chip i {
+    color:     var(--hr-gold);
+    font-size: 11px;
+}
+.hr-chip:hover {
+    background:   rgba(212,175,55,0.12);
+    border-color: rgba(212,175,55,0.35);
+    color:        var(--hr-text);
+    transform:    translateY(-2px);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   AUTO-PLAY PROGRESS BAR (top edge of hero)
+   Fills from 0 → 100% during each slide's display time.
+   ══════════════════════════════════════════════════════════════ */
+.hr-progress {
+    position:   absolute;
+    top:        0;
+    left:       0;
+    right:      0;
+    height:     3px;
+    background: rgba(255,255,255,0.08);
+    z-index:    20;
+}
+
+.hr-progress-fill {
+    height:     100%;
+    width:      0%;
+    background: linear-gradient(90deg, var(--hr-gold-lt), var(--hr-gold));
+    box-shadow: 0 0 8px var(--hr-gold-glow);
+    transition: width linear; /* duration set by JS via inline style */
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SLIDE COUNTER  (e.g. 01 / 03)
+   ══════════════════════════════════════════════════════════════ */
+.hr-counter {
+    position:    absolute;
+    bottom:      44px;
+    right:       48px;
+    z-index:     20;
+    display:     flex;
+    align-items: baseline;
+    gap:         6px;
+    font-family: var(--hr-font-body);
+    color:       var(--hr-text-muted);
+}
+.hr-counter-cur {
+    font-size:   28px;
+    font-weight: 600;
+    color:       var(--hr-gold);
+    line-height: 1;
+    transition:  color 0.3s;
+}
+.hr-counter-sep {
+    font-size: 16px;
+    opacity:   0.4;
+}
+.hr-counter-tot {
+    font-size: 14px;
+    opacity:   0.5;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   ARROW NAVIGATION
+   ══════════════════════════════════════════════════════════════ */
+.hr-arrows {
+    position: absolute;
+    top:      50%;
+    left:     0;
+    right:    0;
+    transform: translateY(-50%);
+    z-index:  20;
+    pointer-events: none; /* container is invisible; buttons get pointer-events */
+}
+
+.hr-arrow {
+    position:        absolute;
+    top:             0;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    width:           56px;
+    height:          56px;
+    border-radius:   50%;
+    border:          1px solid rgba(255,255,255,0.16);
+    background:      rgba(10,10,20,0.50);
+    backdrop-filter: blur(14px);
+    color:           var(--hr-white);
+    font-size:       16px;
+    cursor:          pointer;
+    pointer-events:  auto;
+    transition:      all 0.28s var(--hr-spring);
+    transform:       translateY(-50%);
+}
+.hr-arrow--prev { left:  32px; }
+.hr-arrow--next { right: 32px; }
+
+.hr-arrow:hover {
+    background:   rgba(212,175,55,0.20);
+    border-color: var(--hr-gold);
+    color:        var(--hr-gold-lt);
+    transform:    translateY(-50%) scale(1.10);
+    box-shadow:   0 0 20px rgba(212,175,55,0.25);
+}
+.hr-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   DOT INDICATORS
+   ══════════════════════════════════════════════════════════════ */
+.hr-dots {
+    position:  absolute;
+    bottom:    44px;
+    left:      50%;
+    transform: translateX(-50%);
+    display:   flex;
+    gap:       10px;
+    z-index:   20;
+}
+
+.hr-dot {
+    width:         8px;
+    height:        8px;
+    border-radius: 999px;
+    background:    rgba(255,255,255,0.25);
+    border:        none;
+    cursor:        pointer;
+    padding:       0;
+    transition:    all 0.35s var(--hr-spring);
+}
+.hr-dot:hover {
+    background: rgba(255,255,255,0.55);
+    transform:  scale(1.25);
+}
+.hr-dot--active {
+    width:      32px;
+    background: var(--hr-gold);
+    box-shadow: 0 0 10px var(--hr-gold-glow);
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLL CUE (bottom centre)
+   ══════════════════════════════════════════════════════════════ */
+.hr-scroll-cue {
+    position:  absolute;
+    bottom:    40px;
+    left:      8%;       /* aligns with content left edge */
+    z-index:   20;
+    display:   flex;
+    flex-direction: column;
+    align-items:    center;
+    gap:            8px;
+}
+
+.hr-scroll-label {
+    font-family:    var(--hr-font-body);
+    font-size:      9px;
+    font-weight:    600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color:          var(--hr-text-muted);
+    writing-mode:   vertical-lr;
+}
+
+.hr-scroll-line {
+    display:    block;
+    width:      1px;
+    height:     0;
+    background: linear-gradient(to bottom, var(--hr-gold), transparent);
+    animation:  hr-scroll-line 2.2s ease-in-out infinite;
+}
+@keyframes hr-scroll-line {
+    0%   { height: 0;    opacity: 0; }
+    40%  { height: 48px; opacity: 1; }
+    80%  { height: 48px; opacity: 0; }
+    100% { height: 0;    opacity: 0; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Large desktop (1440px+) ─────────────────────────────────── */
+@media (min-width: 1440px) {
+    .hr-content { padding-left: 9%; }
+}
+
+/* ── Standard desktop (1200px–1440px) ── already default above ─ */
+
+/* ── Small laptop / large tablet (900px–1200px) ─────────────── */
+@media (max-width: 1200px) {
+    .hr-title  { font-size: clamp(44px, 6vw, 76px); }
+    .hr-arrow--prev { left:  20px; }
+    .hr-arrow--next { right: 20px; }
+    .hr-counter     { right: 28px; }
+}
+
+/* ── Tablet portrait (768px–900px) ──────────────────────────── */
+@media (max-width: 900px) {
+    .hr-content {
+        padding:        0 32px 80px;
+        justify-content: flex-end;
+        text-align:      center;
+        align-items:     center;
+    }
+
+    /* On tablet, strengthen overlay so portrait text is readable */
+    .hr-overlay {
+        background: rgba(0,0,0, calc(var(--hr-overlay-opacity) * 1.15));
+    }
+
+    .hr-content > * { max-width: 100%; }
+
+    .hr-eyebrow       { justify-content: center; }
+    .hr-eyebrow-line  { display: none; }
+
+    .hr-title  { font-size: clamp(40px, 7vw, 68px); letter-spacing: -1px; }
+    .hr-sub    { font-size: 16px; max-width: 480px; }
+    .hr-btns   { justify-content: center; }
+    .hr-chips  { justify-content: center; }
+
+    .hr-scroll-cue { display: none; }
+
+    .hr-arrow { width: 48px; height: 48px; font-size: 14px; }
+    .hr-arrow--prev { left:  12px; }
+    .hr-arrow--next { right: 12px; }
+
+    .hr-counter { bottom: 88px; right: 50%; transform: translateX(50%); }
+    .hr-dots    { bottom: 52px; }
+}
+
+/* ── Mobile landscape & large phones (600px–768px) ──────────── */
+@media (max-width: 768px) {
+    .hr-section { min-height: 580px; }
+
+    .hr-content { padding: 0 24px 72px; }
+
+    .hr-title   { font-size: clamp(36px, 9vw, 58px); }
+    .hr-sub     { font-size: 14.5px; }
+
+    .hr-btn {
+        padding:   13px 24px;
+        font-size: 13px;
+    }
+
+    .hr-chips { display: none; } /* hide on mobile to reduce clutter */
+
+    .hr-arrow { width: 44px; height: 44px; }
+}
+
+/* ── Small phones (< 480px) ─────────────────────────────────── */
+@media (max-width: 480px) {
+    .hr-section { min-height: 540px; }
+
+    .hr-content { padding: 0 20px 64px; }
+
+    .hr-title   { font-size: clamp(32px, 10vw, 48px); letter-spacing: -0.5px; }
+    .hr-sub     { font-size: 13.5px; }
+
+    .hr-btns {
+        flex-direction: column;
+        align-items:    stretch;
+        width:          100%;
+        max-width:      280px;
+    }
+    .hr-btn { justify-content: center; }
+
+    .hr-arrow   { width: 40px; height: 40px; font-size: 12px; }
+    .hr-counter { display: none; } /* too crowded on tiny screens */
+}
+
+/* ── Very short screens (landscape phones) ───────────────────── */
+@media (max-height: 500px) {
+    :root { --hr-min-height: 420px; }
+    .hr-content { padding-bottom: 56px; }
+    .hr-sub     { display: none; }
+    .hr-chips   { display: none; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   REDUCED MOTION — respect user preference
+   ══════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .hr-slide          { transition: opacity 0.2s; }
+    .hr-img            { transition: none; transform: scale(1) !important; }
+    .hr-content,
+    .hr-eyebrow,
+    .hr-title,
+    .hr-sub,
+    .hr-btns,
+    .hr-chips          { transition: none; opacity: 1; transform: none; }
+    .hr-ptcl           { animation: none; display: none; }
+    .hr-scroll-line,
+    .hr-eyebrow-dot,
+    .hr-dot-pulse,
+    .hr-title-em::after { animation: none; }
+    .hr-progress-fill  { transition: none; }
+}

@@ -1,0 +1,1008 @@
+/* ============================================================
+   team.css  ·  Sound Vision — Team Section  v4
+   Namespace : sv-tm-   (no collision with award.css)
+   Fixed     : font loading · contrast · CEO clipping · depth
+   Font      : Plus Jakarta Sans (clean, always loads, premium)
+   ============================================================ */
+
+/* Two guaranteed-load fonts: no variable axes, no opsz ranges */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* ══════════════════════════════════════════
+   DESIGN TOKENS  — scoped to .sv-tm-section
+   All variables prefixed --tm- so no leakage
+══════════════════════════════════════════ */
+.sv-tm-section {
+    /* Brand colours */
+    --tm-teal:       #00C9AE;
+    --tm-teal-lt:    #4DFFD8;
+    --tm-teal-dk:    #009680;
+    --tm-blue:       #4488FF;
+    --tm-gold:       #D4AF37;
+    --tm-gold-lt:    #F0D060;
+
+    /* Backgrounds — clearly stepped, never flat */
+    --tm-bg-page:    #040810;
+    --tm-bg-sect:    #060C18;
+    --tm-bg-card:    #0C1830;   /* card base — visible difference from section */
+    --tm-bg-card2:   #101E38;   /* card inner panels */
+    --tm-bg-card3:   #152440;   /* card hover / deep */
+
+    /* ── TEXT COLOURS — all WCAG AA on dark bg ── */
+    --tm-text-h:     #FFFFFF;   /* headings — pure white, max contrast     */
+    --tm-text-b:     #D0E8F8;   /* body copy — bright cool white            */
+    --tm-text-s:     #8BBCDC;   /* secondary — clearly readable on dark     */
+    --tm-text-m:     #5A8AAA;   /* muted labels — still legible             */
+
+    /* Borders */
+    --tm-bdr:        rgba(0,201,174,0.13);
+    --tm-bdr-md:     rgba(0,201,174,0.25);
+    --tm-bdr-gold:   rgba(212,175,55,0.40);
+
+    /* Shadows — layered for real depth */
+    --tm-sh-card:    0 2px 8px rgba(0,0,0,0.6),
+                     0 8px 32px rgba(0,0,0,0.4),
+                     inset 0 1px 0 rgba(255,255,255,0.04);
+    --tm-sh-hover:   0 8px 24px rgba(0,0,0,0.7),
+                     0 24px 64px rgba(0,201,174,0.20),
+                     inset 0 1px 0 rgba(255,255,255,0.06);
+    --tm-sh-ceo:     0 4px 16px rgba(0,0,0,0.7),
+                     0 12px 48px rgba(212,175,55,0.18),
+                     inset 0 1px 0 rgba(255,255,255,0.06);
+    --tm-sh-ceo-h:   0 8px 32px rgba(0,0,0,0.8),
+                     0 28px 80px rgba(212,175,55,0.28),
+                     inset 0 1px 0 rgba(255,255,255,0.08);
+
+    /* Typography */
+    --tm-f-head:     'Libre Baskerville', Georgia, 'Times New Roman', serif;
+    --tm-f-body:     'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+
+    /* Motion */
+    --tm-ease:       cubic-bezier(0.4, 0, 0.2, 1);
+    --tm-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+    --tm-out:        cubic-bezier(0, 0, 0.2, 1);
+
+    /* Card sizing */
+    --tm-cw:  280px;
+    --tm-ch:  480px;
+    --tm-gap: 24px;
+}
+
+/* ── Scoped reset (box-sizing only) ── */
+.sv-tm-section *,
+.sv-tm-section *::before,
+.sv-tm-section *::after { box-sizing: border-box; }
+
+/* ══════════════════════════════════════════
+   SECTION BASE
+══════════════════════════════════════════ */
+.sv-tm-section {
+    position:   relative;
+    background: var(--tm-bg-sect);
+    padding:    30px 0 30px;
+    overflow:   hidden;
+    font-family: var(--tm-f-body);
+    font-size:  16px;
+    line-height: 1.65;
+    color:      var(--tm-text-b);
+}
+
+/* ══════════════════════════════════════════
+   BACKGROUND ATMOSPHERE
+══════════════════════════════════════════ */
+.sv-tm-bg {
+    position:       absolute;
+    inset:          0;
+    pointer-events: none;
+    z-index:        0;
+    overflow:       hidden;
+}
+.sv-tm-bg-glow {
+    position:      absolute;
+    border-radius: 50%;
+    filter:        blur(110px);
+    will-change:   opacity, transform;
+}
+.sv-tm-bg-glow--a {
+    width: 900px; height: 900px;
+    background: radial-gradient(circle, rgba(0,201,174,0.18) 0%, transparent 60%);
+    top: -260px; left: -300px;
+    animation: sv-tm-glow 11s ease-in-out infinite;
+}
+.sv-tm-bg-glow--b {
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(68,136,255,0.14) 0%, transparent 60%);
+    bottom: -200px; right: -220px;
+    animation: sv-tm-glow 14s ease-in-out infinite reverse;
+}
+.sv-tm-bg-glow--c {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(212,175,55,0.09) 0%, transparent 65%);
+    top: 40%; left: 42%;
+    transform: translate(-50%, -50%);
+    animation: sv-tm-glow 9s ease-in-out infinite 2s;
+}
+@keyframes sv-tm-glow {
+    0%, 100% { opacity: 0.6; transform: scale(1);    }
+    50%       { opacity: 1;   transform: scale(1.12); }
+}
+
+.sv-tm-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0,201,174,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,201,174,0.035) 1px, transparent 1px);
+    background-size: 64px 64px;
+}
+
+/* Particle dots — JS spawns them */
+.sv-tm-particles { position: absolute; inset: 0; overflow: hidden; }
+.sv-tm-ptcl {
+    position:      absolute;
+    border-radius: 50%;
+    opacity:       0;
+    animation:     sv-tm-rise linear infinite;
+}
+@keyframes sv-tm-rise {
+    0%   { transform: translateY(108%) translateX(0);           opacity: 0;   }
+    8%   {                                                       opacity: 0.9; }
+    90%  {                                                       opacity: 0.3; }
+    100% { transform: translateY(-6%)  translateX(var(--dx,0)); opacity: 0;   }
+}
+
+/* ══════════════════════════════════════════
+   CONTAINER
+══════════════════════════════════════════ */
+.sv-tm-container {
+    position:   relative;
+    z-index:    1;
+    max-width:  1520px;
+    margin:     0 auto;
+    padding:    0 44px;
+}
+
+/* ══════════════════════════════════════════
+   SECTION HEADER
+══════════════════════════════════════════ */
+.sv-tm-header {
+    text-align:    center;
+    /*margin-bottom: 84px;*/
+}
+
+/* Eyebrow */
+.sv-tm-eyebrow {
+    display:     inline-flex;
+    align-items: center;
+    gap:         14px;
+    margin-bottom: 26px;
+}
+.sv-tm-eyebrow-line {
+    display:    block;
+    width:      38px;
+    height:     1px;
+    background: linear-gradient(90deg, transparent, var(--tm-teal), transparent);
+}
+.sv-tm-eyebrow-text {
+    font-family:    var(--tm-f-body);
+    font-size:      11.5px;
+    font-weight:    700;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color:          var(--tm-teal);
+}
+
+/* Main heading */
+.sv-tm-title {
+    font-family:    var(--tm-f-head);
+    font-size:      clamp(52px, 7.5vw, 88px);
+    font-weight:    700;
+    line-height:    1.1;
+    letter-spacing: -1px;
+    margin-bottom:  20px;
+    color:          var(--tm-text-h);
+}
+/* Normal (non-accent) words in the title — explicit white */
+.sv-tm-title-normal {
+    color:          var(--tm-text-h);
+    font-weight:    700;
+}
+.sv-tm-title-accent {
+    font-style:  italic;
+    background:  linear-gradient(135deg, var(--tm-teal-lt) 0%, var(--tm-teal) 50%, var(--tm-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip:         text;
+    display:   inline;
+    position:  relative;
+}
+.sv-tm-title-accent::after {
+    content:  '';
+    position: absolute;
+    left: 0; right: 0; bottom: 6px;
+    height:        2px;
+    border-radius: 99px;
+    background:    linear-gradient(90deg, var(--tm-teal-lt), var(--tm-teal), var(--tm-blue));
+    animation:     sv-tm-ul 3s ease-in-out infinite;
+    pointer-events: none;
+}
+@keyframes sv-tm-ul {
+    0%, 100% { opacity: 0.4; transform: scaleX(0.9);  }
+    50%       { opacity: 0.9; transform: scaleX(1);    }
+}
+
+/* Subtitle — readable muted */
+.sv-tm-subtitle {
+    font-size:   18px;
+    font-weight: 400;
+    color:       var(--tm-text-s);   /* #8BBCDC — clearly readable */
+    max-width:   580px;
+    margin:      0 auto 44px;
+    line-height: 1.8;
+}
+
+/* Stats pill */
+.sv-tm-stats-row {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             36px;
+    padding:         18px 44px;
+    background:      rgba(0,201,174,0.05);
+    border:          1px solid var(--tm-bdr-md);
+    border-radius:   999px;
+    backdrop-filter: blur(14px);
+    box-shadow:      0 4px 24px rgba(0,0,0,0.3);
+}
+.sv-tm-stat-item {
+    display:        flex;
+    flex-direction: column;
+    align-items:    center;
+    gap:            5px;
+}
+.sv-tm-stat-n {
+    font-family:    var(--tm-f-head);
+    font-size:      30px;
+    font-weight:    800;
+    color:          var(--tm-teal);
+    line-height:    1;
+    letter-spacing: -0.5px;
+}
+.sv-tm-stat-l {
+    font-size:      11px;
+    font-weight:    600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color:          var(--tm-text-s);   /* was near-invisible — now clear */
+    white-space:    nowrap;
+}
+.sv-tm-stat-sep {
+    width:      1px;
+    height:     44px;
+    background: var(--tm-bdr);
+}
+
+/* ══════════════════════════════════════════
+   GRID LAYOUT
+══════════════════════════════════════════ */
+.sv-tm-layout {
+    display:               grid;
+    grid-template-columns: var(--tm-cw) 1fr;
+    gap:                   56px;
+    align-items:           start;
+}
+
+/* ══════════════════════════════════════════
+   CEO CARD
+   Strategy: .sv-tm-ceo-frame is the ONLY
+   sizing/clipping authority. Every child
+   (crown, card, photo, body) is absolutely
+   positioned inside it. HTML order does NOT
+   matter. Nothing can bleed outside.
+══════════════════════════════════════════ */
+
+/* Col wrapper — no sizing, just stacking context */
+.sv-tm-ceo-col {
+    position: relative;
+}
+
+/* ── FRAME: the one true bounding box ── */
+.sv-tm-ceo-frame {
+    position: relative;
+    width:    var(--tm-cw);
+    /* --tm-ceo-body-h is set per-breakpoint below.
+       Default body height = 210px                  */
+    --tm-ceo-body-h: 150px;
+    height:   calc(var(--tm-ch) + 28px); /* card + crown clearance */
+    /* Hard clip — NOTHING escapes this box */
+    overflow:      hidden;
+    border-radius: 22px;
+    /* Allow crown badge to peek above
+    overflow:      visible;*/
+}
+
+/* Inner clip layer that clips the card but not the crown */
+.sv-tm-ceo-frame::after {
+    content:       '';
+    position:      absolute;
+    top:           28px; /* below crown */
+    left:          0; right: 0; bottom: 0;
+    border-radius: 20px;
+    pointer-events: none;
+    z-index:       40;
+    /* No visual — just used as reference; actual clipping
+       is on .sv-tm-ceo-card via overflow:hidden           */
+}
+
+/* Crown badge — sits at very top of frame */
+.sv-tm-crown {
+    position:  absolute;
+    top:       0;
+    left:      50%;
+    transform: translateX(-50%);
+    z-index:   50;
+    display:        inline-flex;
+    align-items:    center;
+    gap:            8px;
+    padding:        6px 16px;
+    border-radius:  999px;
+    background:     linear-gradient(135deg, #160F00 0%, #2C2000 100%);
+    border:         1px solid rgba(212,175,55,0.65);
+    box-shadow:     0 0 20px rgba(212,175,55,0.28),
+                    0 4px 14px rgba(0,0,0,0.6);
+    white-space:    nowrap;
+    pointer-events: none;
+}
+.sv-tm-crown-icon { font-size: 13px; line-height: 1; }
+.sv-tm-crown-text {
+    font-family:    var(--tm-f-body);
+    font-size:      10px;
+    font-weight:    800;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color:          var(--tm-gold-lt);
+}
+
+/* ── CEO CARD: absolute, fills frame below crown ── */
+.sv-tm-ceo-card {
+    position:        absolute;
+    top:             28px;   /* sits right below crown */
+    left:            0;
+    right:           0;
+    bottom:          0;
+    /* height = var(--tm-ch) derived from frame */
+    display:         flex;
+    flex-direction:  column;
+    border-radius:   20px;
+    overflow:        hidden;  /* THIS clips photo + body inside card */
+    text-decoration: none;
+    color:           inherit;
+    background:      var(--tm-bg-card);
+    border:          1px solid var(--tm-bdr-gold);
+    box-shadow:      var(--tm-sh-ceo);
+    cursor:          pointer;
+    transition:      transform 0.45s var(--tm-spring),
+                     box-shadow 0.45s var(--tm-ease),
+                     border-color 0.3s var(--tm-ease);
+    will-change:     transform, box-shadow;
+}
+.sv-tm-ceo-card:hover {
+    transform:    translateY(-8px) scale(1.02);
+    box-shadow:   var(--tm-sh-ceo-h);
+    border-color: rgba(212,175,55,0.6);
+}
+
+/* Animated gradient border ring */
+.sv-tm-ceo-ring {
+    position:       absolute;
+    inset:          -1px;
+    border-radius:  21px;
+    z-index:        0;
+    pointer-events: none;
+    background: conic-gradient(
+        from 0deg,
+        rgba(212,175,55,0.8)  0deg,
+        rgba(0,201,174,0.6)  90deg,
+        rgba(68,136,255,0.4) 180deg,
+        rgba(212,175,55,0.8) 270deg,
+        rgba(0,201,174,0.6)  360deg
+    );
+    -webkit-mask:          linear-gradient(#fff 0 0) content-box,
+                           linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite:         exclude;
+    padding:   1px;
+    animation: sv-tm-ring 6s linear infinite;
+}
+@keyframes sv-tm-ring {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ── CEO PHOTO: fills top of card, stops above body ── */
+.sv-tm-ceo-photo {
+    position:   absolute;
+    top:        0;
+    left:       0;
+    right:      0;
+    /* bottom = body height — photo fills remaining space */
+    
+    overflow:   hidden;
+    background: var(--tm-bg-card2);
+    z-index:    1;
+}
+.sv-tm-ceo-img {
+    width:           100%;
+    height:          100%;
+    object-fit:      cover;
+    object-position: top center;
+    display:         block;
+    transition:      transform 0.6s var(--tm-ease);
+}
+.sv-tm-ceo-card:hover .sv-tm-ceo-img { transform: scale(1.09); }
+.sv-tm-ceo-photo-placeholder {
+    position:        absolute; inset: 0;
+    display:         none;
+    align-items:     center;
+    justify-content: center;
+    font-size:       60px;
+    opacity:         0.07;
+}
+.sv-tm-ceo-photo.sv-tm-no-img .sv-tm-ceo-photo-placeholder { display: flex; }
+.sv-tm-ceo-photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+        to top,
+        var(--tm-bg-card) 0%,
+        rgba(12,24,48,0.25) 55%,
+        transparent 100%
+    );
+    z-index:        2;
+    pointer-events: none;
+}
+
+/* ── CEO BODY: pinned to bottom of card ── */
+.sv-tm-ceo-body {
+    position:       absolute;
+    left:           0;
+    right:          0;
+    bottom:         0;
+    height:         var(--tm-ceo-body-h);  /* matches photo's bottom offset */
+    padding:        14px 16px 12px;
+    display:        flex;
+    flex-direction: column;
+    gap:            7px;
+    background:     var(--tm-bg-card);
+    z-index:        3;
+    box-shadow:     inset 0 2px 8px rgba(0,0,0,0.3);
+    overflow:       hidden;
+}
+
+/* Hide the <br> spacers in CEO body */
+.sv-tm-ceo-body br { display: none; }
+
+/* Role label */
+.sv-tm-ceo-role-label {
+    font-family:    var(--tm-f-body);
+    font-size:      10px;
+    font-weight:    700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color:          var(--tm-gold);
+    line-height:    1;
+    flex-shrink:    0;
+}
+
+/* CEO name */
+.sv-tm-ceo-name {
+    font-family:   var(--tm-f-head);
+    font-size:     18px;
+    font-weight:   700;
+    font-style:    italic;
+    color:         var(--tm-text-h);
+    line-height:   1.2;
+    white-space:   nowrap;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    flex-shrink:   0;
+}
+
+/* Bio text — hidden */
+.sv-tm-ceo-bio { display: none; }
+
+/* Chips in CEO body */
+.sv-tm-ceo-body .sv-tm-chips {
+    gap:         4px;
+    flex-wrap:   nowrap;
+    overflow:    hidden;
+    flex-shrink: 0;
+}
+.sv-tm-ceo-body .sv-tm-chip {
+    font-size:     10px;
+    padding:       3px 8px;
+    border-radius: 5px;
+}
+
+/* Social icons in CEO body */
+.sv-tm-ceo-socials {
+    display:     flex;
+    gap:         5px;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap:   nowrap;
+    overflow:    hidden;
+}
+.sv-tm-ceo-socials .sv-tm-soc-btn {
+    width:         30px;
+    height:        30px;
+    border-radius: 8px;
+    flex-shrink:   0;
+}
+.sv-tm-ceo-socials .sv-tm-soc-btn svg { width: 13px; height: 13px; }
+
+/* ── Shared: Skill chips ── */
+.sv-tm-chips {
+    display:   flex;
+    flex-wrap: wrap;
+    gap:       7px;
+}
+.sv-tm-chip {
+    display:        inline-flex;
+    align-items:    center;
+    padding:        6px 14px;
+    border-radius:  8px;
+    background:     rgba(0,201,174,0.10);
+    border:         1px solid rgba(0,201,174,0.24);
+    font-family:    var(--tm-f-body);
+    font-size:      11px;
+    font-weight:    700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color:          var(--tm-teal);
+    line-height:    1;
+}
+.sv-tm-chip--sm {
+    font-size:    10px;
+    padding:      4px 10px;
+    border-radius: 6px;
+}
+
+/* ── Shared: Social icon buttons ── */
+.sv-tm-ceo-socials,
+.sv-tm-card-socials {
+    display:     flex;
+    gap:         8px;
+    flex-wrap:   wrap;
+    align-items: center;
+}
+.sv-tm-soc-btn {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    width:           40px;
+    height:          40px;
+    border-radius:   10px;
+    background:      rgba(255,255,255,0.06);
+    border:          1px solid rgba(255,255,255,0.10);
+    color:           var(--tm-text-s);
+    text-decoration: none;
+    flex-shrink:     0;
+    transition:
+        background   0.22s var(--tm-ease),
+        border-color 0.22s var(--tm-ease),
+        color        0.22s var(--tm-ease),
+        transform    0.30s var(--tm-spring);
+}
+.sv-tm-soc-btn svg  { width: 17px; height: 17px; display: block; flex-shrink: 0; }
+.sv-tm-soc-btn:hover {
+    background:   rgba(0,201,174,0.18);
+    border-color: var(--tm-teal);
+    color:        var(--tm-teal);
+    transform:    translateY(-3px);
+}
+.sv-tm-soc-btn--sm {
+    width:         34px;
+    height:        34px;
+    border-radius: 9px;
+}
+.sv-tm-soc-btn--sm svg { width: 15px; height: 15px; }
+
+/* CEO CTA — fades up on hover */
+.sv-tm-ceo-cta {
+    display:        inline-flex;
+    align-items:    center;
+    gap:            5px;
+    margin-top:     auto;
+    font-family:    var(--tm-f-body);
+    font-size:      11px;
+    font-weight:    700;
+    color:          var(--tm-teal);
+    letter-spacing: 0.3px;
+    opacity:        0;
+    transform:      translateY(6px);
+    transition:     opacity 0.25s var(--tm-ease), transform 0.25s var(--tm-ease);
+}
+.sv-tm-ceo-card:hover .sv-tm-ceo-cta {
+    opacity:   1;
+    transform: translateY(0);
+}
+.sv-tm-cta-arr {
+    display:   inline-block;
+    animation: sv-tm-arr 1.4s ease-in-out infinite;
+}
+@keyframes sv-tm-arr {
+    0%, 100% { transform: translateX(0);  }
+    50%       { transform: translateX(5px); }
+}
+
+/* ══════════════════════════════════════════
+   SCROLL COLUMN — infinite marquee
+══════════════════════════════════════════ */
+.sv-tm-scroll-col {
+    display:        flex;
+    flex-direction: column;
+    gap:            20px;
+    min-width:      0;
+}
+
+/* Outer wrapper — clips track, applies side fades */
+.sv-tm-scroll-outer {
+    position:      relative;
+    overflow:      hidden;
+    border-radius: 20px;
+    /* Edge fade masks for cinematic reveal */
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 7%,
+        #000 93%,
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        #000 7%,
+        #000 93%,
+        transparent 100%
+    );
+}
+
+/* Track — JS RAF drives translateX, no CSS animation at all */
+.sv-tm-scroll-track {
+    display:     flex;
+    gap:         var(--tm-gap);
+    align-items: stretch;
+    padding:     32px 0;       /* breathing room top/bottom */
+    will-change: transform;
+}
+
+/* ── Member card ── */
+.sv-tm-card {
+    flex:          0 0 var(--tm-cw);
+    width:         var(--tm-cw);
+    height:        var(--tm-ch);
+    border-radius: 20px;
+    overflow:      hidden;
+    display:       flex;
+    flex-direction: column;
+    background:    var(--tm-bg-card);
+    border:        1px solid var(--tm-bdr);
+    box-shadow:    var(--tm-sh-card);
+    position:      relative;
+    cursor:        pointer;
+    will-change:   transform;
+    transition:
+        transform    0.45s var(--tm-spring),
+        box-shadow   0.45s var(--tm-ease),
+        border-color 0.3s  var(--tm-ease);
+}
+.sv-tm-card:hover {
+    transform:    translateY(-12px) scale(1.04);
+    box-shadow:   var(--tm-sh-hover);
+    border-color: var(--tm-bdr-md);
+    z-index:      30;
+}
+
+/* Inner top light line — gives the "lifted panel" look */
+.sv-tm-card::before {
+    content:  '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height:        1px;
+    background:    linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    z-index:       5;
+    pointer-events: none;
+}
+
+/* Photo — takes up most of the card */
+.sv-tm-card-photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 5;   /* 🔥 THIS FIXES EVERYTHING */
+    overflow: hidden;
+    background: var(--tm-bg-card2);
+}
+.sv-tm-card-img {
+    width:           100%;
+    height:          100%;
+    object-fit:      cover;
+    object-position: top center;
+    display:         block;
+    transition:      transform 0.6s var(--tm-ease);
+}
+.sv-tm-card:hover .sv-tm-card-img { transform: scale(1.09); }
+
+.sv-tm-card-photo-placeholder {
+    position:        absolute; inset: 0;
+    display:         none;
+    align-items:     center;
+    justify-content: center;
+    font-size:       60px;
+    opacity:         0.07;
+}
+.sv-tm-card-photo.sv-tm-no-img .sv-tm-card-photo-placeholder { display: flex; }
+
+.sv-tm-card-photo-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+        to top,
+        var(--tm-bg-card) 0%,
+        rgba(12,24,48,0.25) 55%,
+        transparent 100%
+    );
+    z-index:        2;
+    pointer-events: none;
+}
+
+/* Role pill over photo */
+.sv-tm-card-role {
+    position:        absolute;
+    bottom:          12px; left: 12px; right: 12px;
+    z-index:         4;
+    text-align:      center;
+    padding:         5px 10px;
+    border-radius:   8px;
+    background:      rgba(4,8,16,0.82);
+    border:          1px solid rgba(0,201,174,0.28);
+    backdrop-filter: blur(12px);
+    font-family:     var(--tm-f-body);
+    font-size:       10px;
+    font-weight:     700;
+    letter-spacing:  1.2px;
+    text-transform:  uppercase;
+    color:           var(--tm-teal);
+    white-space:     nowrap;
+    overflow:        hidden;
+    text-overflow:   ellipsis;
+    transition:      opacity 0.25s var(--tm-ease);
+}
+.sv-tm-card:hover .sv-tm-card-role { opacity: 0; }
+
+/* Card body — tall enough for all content without clipping */
+.sv-tm-card-body {
+    flex-shrink:    0;
+    height:         210px;
+    padding:        18px 18px 16px;
+    display:        flex;
+    flex-direction: column;
+    gap:            10px;
+    background:     var(--tm-bg-card);
+    position:       relative;
+    z-index:        3;
+    box-shadow:     inset 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Member name */
+.sv-tm-card-name {
+    font-family:   var(--tm-f-head);
+    font-size:     20px;
+    font-weight:   700;
+    font-style:    italic;
+    color:         var(--tm-text-h);
+    line-height:   1.2;
+    white-space:   nowrap;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    flex-shrink:   0;
+}
+
+/* Small chips row */
+.sv-tm-chips--sm {
+    gap:      5px;
+    flex-wrap: nowrap;
+    overflow:  hidden;
+    flex-shrink: 0;
+}
+
+/* Social icons row — always rendered, always visible */
+.sv-tm-card-socials {
+    display:     flex;
+    gap:         6px;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap:   wrap;
+}
+
+/* Profile link — fades up on hover */
+.sv-tm-card-link-btn {
+    display:         inline-flex;
+    align-items:     center;
+    gap:             5px;
+    margin-top:      auto;
+    font-family:     var(--tm-f-body);
+    font-size:       12px;
+    font-weight:     700;
+    color:           var(--tm-teal);
+    text-decoration: none;
+    letter-spacing:  0.3px;
+    opacity:         0;
+    transform:       translateY(6px);
+    transition:
+        opacity   0.25s var(--tm-ease),
+        transform 0.25s var(--tm-ease);
+}
+.sv-tm-card:hover .sv-tm-card-link-btn {
+    opacity:   1;
+    transform: translateY(0);
+}
+.sv-tm-card-link-btn:hover { text-decoration: underline; }
+
+/* Bio tooltip — shows when track is paused on hover */
+.sv-tm-card-tooltip {
+    position:        absolute;
+    bottom:          calc(100% + 14px);
+    left:            50%;
+    transform:       translateX(-50%) translateY(10px);
+    width:           250px;
+    background:      var(--tm-bg-card3);
+    border:          1px solid var(--tm-bdr-md);
+    border-radius:   14px;
+    padding:         16px 18px;
+    font-family:     var(--tm-f-body);
+    font-size:       13.5px;
+    font-weight:     400;
+    line-height:     1.7;
+    color:           var(--tm-text-b);   /* readable body colour */
+    box-shadow:      0 20px 60px rgba(0,0,0,0.7);
+    opacity:         0;
+    pointer-events:  none;
+    transition:
+        opacity   0.25s var(--tm-ease),
+        transform 0.25s var(--tm-ease);
+    z-index:         9999;
+    backdrop-filter: blur(18px);
+}
+.sv-tm-card-tooltip::after {
+    content:         '';
+    position:        absolute;
+    top:             100%; left: 50%;
+    transform:       translateX(-50%);
+    border:          8px solid transparent;
+    border-top-color: var(--tm-bdr-md);
+}
+/* Only show when track is paused (outer hover) */
+.sv-tm-scroll-outer:hover .sv-tm-card:hover .sv-tm-card-tooltip {
+    opacity:   1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ══════════════════════════════════════════
+   HINT ROW
+══════════════════════════════════════════ */
+.sv-tm-hint {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    gap:             10px;
+    font-family:     var(--tm-f-body);
+    font-size:       12.5px;
+    font-weight:     500;
+    color:           var(--tm-text-s);  /* readable */
+    letter-spacing:  0.3px;
+}
+.sv-tm-hint-dot {
+    width:         7px;
+    height:        7px;
+    border-radius: 50%;
+    background:    var(--tm-teal);
+    flex-shrink:   0;
+    animation:     sv-tm-dot 2.2s ease-in-out infinite;
+}
+@keyframes sv-tm-dot {
+    0%, 100% { opacity: 0.3; transform: scale(1);   }
+    50%       { opacity: 1;   transform: scale(1.5); }
+}
+
+/* ══════════════════════════════════════════
+   SCROLL-REVEAL
+══════════════════════════════════════════ */
+[data-tm-reveal] {
+    opacity:    0;
+    transform:  translateY(40px);
+    transition:
+        opacity   0.9s var(--tm-out),
+        transform 0.9s var(--tm-out);
+}
+[data-tm-reveal].sv-tm-in {
+    opacity:   1;
+    transform: translateY(0);
+}
+[data-tm-reveal]:nth-child(2) { transition-delay: 0.2s; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+   CEO card uses absolute positioning — only
+   two variables need changing per breakpoint:
+     --tm-cw  : card width (frame width too)
+     --tm-ch  : card height (frame = ch+28px)
+     --tm-ceo-body-h : body height (controls
+       where photo stops and body begins)
+   Member cards: just --tm-cw --tm-ch --tm-gap
+══════════════════════════════════════════ */
+
+/* ── ≥ 1241px : default 2-col ── */
+/* --tm-cw:280  --tm-ch:480  --tm-ceo-body-h:210px */
+/* frame: 508px  photo: 270px  body: 210px          */
+
+/* ── 1001–1240px : 2-col tighter ── */
+@media (min-width: 1001px) and (max-width: 1240px) {
+    .sv-tm-section   {
+        --tm-cw:          240px;
+        --tm-ch:          420px;
+        --tm-ceo-body-h:  185px;
+        --tm-gap:         18px;
+    }
+    .sv-tm-layout    { grid-template-columns: var(--tm-cw) 1fr; gap: 32px; }
+    .sv-tm-container { padding: 0 28px; }
+    .sv-tm-header    { margin-bottom: 56px; }
+    .sv-tm-ceo-frame { width: var(--tm-cw); height: calc(var(--tm-ch) + 28px); }
+    .sv-tm-card-body { height: 185px; padding: 13px 14px 11px; }
+}
+
+/* ── ≤ 1000px : 1-col stack ── */
+@media (max-width: 1000px) {
+    .sv-tm-section   {
+        --tm-cw:          280px;
+        --tm-ch:          450px;
+        --tm-ceo-body-h:  190px;
+        --tm-gap:         20px;
+    }
+    .sv-tm-layout    { grid-template-columns: 1fr; gap: 40px; }
+    .sv-tm-ceo-col   { max-width: var(--tm-cw); margin: 0 auto; }
+    .sv-tm-ceo-frame { width: var(--tm-cw); height: calc(var(--tm-ch) + 28px); }
+    /* Disable hover lift on single-col — prevents visual jump */
+    .sv-tm-ceo-card:hover { transform: none; box-shadow: var(--tm-sh-ceo); }
+    .sv-tm-card-body { height: 190px; }
+}
+
+/* ── ≤ 700px : mobile ── */
+@media (max-width: 700px) {
+    .sv-tm-section   {
+        padding:          72px 0 56px;
+        --tm-cw:          220px;
+        --tm-ch:          400px;
+        --tm-ceo-body-h:  175px;
+        --tm-gap:         16px;
+    }
+    .sv-tm-container { padding: 0 20px; }
+    .sv-tm-header    { margin-bottom: 52px; }
+    .sv-tm-stats-row { padding: 14px 24px; gap: 22px; }
+    .sv-tm-ceo-frame { width: var(--tm-cw); height: calc(var(--tm-ch) + 28px); }
+    .sv-tm-ceo-card:hover { transform: none; box-shadow: var(--tm-sh-ceo); }
+    .sv-tm-card-body { height: 175px; padding: 12px 13px 10px; }
+}
+
+/* ── ≤ 480px : small phones ── */
+@media (max-width: 480px) {
+    .sv-tm-section   {
+        --tm-cw:          200px;
+        --tm-ch:          360px;
+        --tm-ceo-body-h:  155px;
+        --tm-gap:         14px;
+    }
+    .sv-tm-title     { font-size: 46px; }
+    .sv-tm-stats-row { flex-wrap: wrap; border-radius: 18px; gap: 16px; }
+    .sv-tm-stat-sep  { display: none; }
+    .sv-tm-ceo-frame { width: var(--tm-cw); height: calc(var(--tm-ch) + 28px); }
+    .sv-tm-ceo-card:hover { transform: none; box-shadow: var(--tm-sh-ceo); }
+    .sv-tm-card-body { height: 155px; padding: 11px 12px 10px; }
+}

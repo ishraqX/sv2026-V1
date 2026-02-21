@@ -1,0 +1,128 @@
+/* ===== RESPONSIVE.CSS - Mobile Responsive Styles ===== */
+
+/* Tablet Styles (768px - 1199px) */
+@media (max-width: 1199px) {
+    .container {
+        padding: 0 30px;
+    }
+    
+    .section-header h2 {
+        font-size: 2.2rem;
+    }
+}
+
+/* Mobile Styles (< 768px) */
+@media (max-width: 768px) {
+    /* Typography */
+    .section-header h2 {
+        font-size: 2rem;
+    }
+    
+    .section-header p {
+        font-size: 1rem;
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+    }
+    
+    /* Sections */
+    .sdg-section,
+    .features-section,
+    .app-download,
+    .about-section,
+    .awards-section,
+    .testimonials-section {
+        padding: 4rem 0;
+    }
+}
+
+/* Small Mobile Styles (< 480px) */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    /* Typography */
+    .section-header h2 {
+        font-size: 1.7rem;
+    }
+    
+    .section-header p {
+        font-size: 0.95rem;
+    }
+    
+    /* Sections */
+    .sdg-section,
+    .features-section,
+    .app-download,
+    .about-section,
+    .awards-section,
+    .testimonials-section {
+        padding: 3rem 0;
+    }
+    
+    /* Cards */
+    .sdg-card,
+    .feature-card,
+    .award-card {
+        padding: 2rem;
+    }
+    
+    /* Testimonials */
+    .testimonial-card {
+        padding: 2rem;
+    }
+    
+    .testimonial-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .testimonial-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .testimonial-content p {
+        font-size: 1rem;
+    }
+    
+    /* Counter */
+    .counter-number {
+        font-size: 2.5rem;
+    }
+    
+    .counter-stat strong {
+        font-size: 1.2rem;
+    }
+}
+
+/* Extra Small Mobile (< 375px) */
+@media (max-width: 375px) {
+    .section-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .hero-title {
+        font-size: 1.6rem;
+    }
+    
+    .download-content h2 {
+        font-size: 1.8rem;
+    }
+}
+
+/* Landscape Mode */
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .hero-content {
+        padding: 4rem 0;
+    }
+}

@@ -1,0 +1,265 @@
+/* ===== ABOUT.CSS - About Section Styles ===== */
+
+:root {
+    --primary-color: #8b8bff;
+    --secondary-color: #6b6bff;
+    --text-dark: #1d1d1f;
+    --text-light: #86868b;
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+    --shadow-xl: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.about-section {
+    padding: 6rem 0;
+    background: white;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.about-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+/* ===== FIXED: Image container styles ===== */
+.about-image {
+    position: relative;
+    width: 100%;
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    min-height: 400px; /* Prevents layout shift while loading */
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: var(--shadow-xl);
+    display: block; /* Removes extra space below image */
+    background: #f5f5f7; /* Placeholder background while loading */
+}
+
+/* FIXED: Stats positioning and responsiveness */
+.about-stats {
+    position: absolute;
+    bottom: -25px;
+    right: -25px;
+    display: flex;
+    gap: 1rem;
+    z-index: 10; /* Ensures stats stay above image */
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    min-width: 120px;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.3rem;
+    line-height: 1.2;
+}
+
+.stat-card p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+/* Content Styles */
+.about-content .section-header {
+    text-align: left;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    letter-spacing: -1px;
+}
+
+.header-line {
+    width: 80px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+.about-intro {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+}
+
+.about-description {
+    color: var(--text-light);
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+}
+
+/* About Values */
+.about-values {
+    margin-bottom: 2.5rem;
+}
+
+.value-item {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.value-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.value-content h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+}
+
+.value-content p {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* Button Styles */
+.btn-primary {
+    display: inline-block;
+    padding: 14px 32px;
+    background: var(--text-dark);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(139, 139, 255, 0.3);
+}
+
+/* ===== FIXED: Mobile Responsive ===== */
+@media (max-width: 992px) {
+    .about-wrapper {
+        gap: 3rem;
+    }
+    
+    .about-stats {
+        bottom: -15px;
+        right: -15px;
+    }
+    
+    .stat-card {
+        padding: 1.2rem;
+        min-width: 100px;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-wrapper {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    
+    /* FIXED: Better mobile positioning */
+    .about-image {
+        margin-bottom: 2rem;
+    }
+    
+    .about-stats {
+        position: static;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 2rem;
+        width: 100%;
+    }
+    
+    .stat-card {
+        width: 100%;
+        min-width: 0;
+        padding: 1rem;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.3rem;
+    }
+    
+    .about-image img {
+        min-height: 300px;
+    }
+    
+    .section-header h2 {
+        font-size: 32px;
+    }
+    
+    .about-intro {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-stats {
+        grid-template-columns: 1fr; /* Stack on very small screens */
+    }
+    
+    .value-item {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Image fade-in on load — no opacity:0 initial state so the
+   onerror fallback is never hidden if the image fails */
+.about-image img {
+    animation: aboutFadeIn 0.6s ease forwards;
+}
+
+@keyframes aboutFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

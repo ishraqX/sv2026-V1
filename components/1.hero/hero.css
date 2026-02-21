@@ -1,0 +1,682 @@
+/* ═══════════════════════════════════════════════════════════
+       DESIGN TOKENS
+       Change these variables to reskin the entire hero section
+    ═══════════════════════════════════════════════════════════ */
+    :root {
+        /* ─ Font stack ─────────────────────────────────────────
+           Outfit is a clean geometric sans. If it doesn't load,
+           Trebuchet MS is the best system fallback (same feel).
+           The chain guarantees text NEVER goes invisible.      */
+        --f-main: 'Outfit', 'Trebuchet MS', 'Helvetica Neue', Arial, sans-serif;
+
+        /* ─ Slide duration ───────────────────────────────────── */
+        --slide-dur: 6000ms;    /* ← change to speed up / slow down autoplay */
+        --slide-ease: cubic-bezier(.4,0,.2,1);
+
+        /* ─ Image size ───────────────────────────────────────── */
+        --img-h: 620px;         /* ← max image height on desktop */
+
+        /* ─ Section height ───────────────────────────────────── */
+        --hero-h: 100svh;       /* ← svh = small viewport (safe on mobile) */
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       RESET
+    ───────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--f-main); overflow-x: hidden; }
+    a    { text-decoration: none; color: inherit; }
+    img  { display: block; max-width: 100%; }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERO SECTION
+    ═══════════════════════════════════════════════════════════ */
+    #hero {
+        position:   relative;
+        width:      100%;
+        height:     var(--hero-h);
+        min-height: 400px;
+        overflow:   hidden;
+        isolation:  isolate;
+        /*
+        ┌──────────────────────────────────────────────────────┐
+        │  NAVBAR OFFSET — set this to your navbar height      │
+        │  If content still overlaps navbar, increase this.    │
+        │  If there is too much gap at top, decrease this.     │
+        │  ↓ Change 0px to match your navbar height ↓         │
+        └──────────────────────────────────────────────────────┘
+        */
+        margin-top: 0; /* ← e.g. 70px if you have a fixed 70px navbar */
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       GRADIENT MESH BACKGROUND
+       Three soft colour stops create a living, breathable
+       background. No images needed — pure CSS.
+    ───────────────────────────────────────────────────────── */
+    #hero::before {
+        content:  '';
+        position: absolute;
+        inset:    0;
+        z-index:  0;
+        background:
+            radial-gradient(ellipse 80% 60% at 70% 20%,  #C7EEFF 0%, transparent 55%),
+            radial-gradient(ellipse 60% 70% at 10% 90%,  #E0D4FF 0%, transparent 55%),
+            radial-gradient(ellipse 100% 80% at 50% 50%, #F0F7FF 0%, transparent 100%);
+        background-color: #EEF5FF;
+        animation: bgShift 12s ease-in-out infinite alternate;
+    }
+    @keyframes bgShift {
+        0%   { filter: hue-rotate(0deg) brightness(1);    }
+        100% { filter: hue-rotate(8deg)  brightness(1.03); }
+    }
+
+    /* Subtle dot grid texture */
+    #hero::after {
+        content:    '';
+        position:   absolute;
+        inset:      0;
+        z-index:    1;
+        background: radial-gradient(circle, rgba(0,60,180,.06) 1.2px, transparent 1.2px);
+        background-size: 28px 28px;
+        pointer-events: none;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       SLIDER TRACK
+    ───────────────────────────────────────────────────────── */
+    .hs-track {
+        position: absolute;
+        inset:    0;
+        z-index:  2;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       INDIVIDUAL SLIDE
+       All slides sit on top of each other (position: absolute).
+       The active one is opacity:1, all others opacity:0.
+       Transition handles the crossfade.
+    ───────────────────────────────────────────────────────── */
+    .hs-slide {
+        position:       absolute;
+        inset:          0;
+        display:        flex;
+        align-items:    flex-end;   /* anchors content to bottom so image touches base */
+        opacity:        0;
+        pointer-events: none;
+        transition:     opacity 1s var(--slide-ease);
+        will-change:    opacity;
+    }
+    .hs-slide.is-active {
+        opacity:        1;
+        pointer-events: auto;
+    }
+
+    /* Inner grid: text LEFT (52%) | image RIGHT (48%) */
+    .hs-inner {
+        display:               grid;
+        grid-template-columns: 52fr 48fr;
+        align-items:           flex-end;  /* image column grounded at bottom */
+        width:                 100%;
+        max-width:             1280px;
+        margin:                0 auto;
+        /*
+        ┌─────────────────────────────────────────────────────┐
+        │  DESKTOP SPACING — adjust these two values manually │
+        │  padding-top   = space from top   (clears navbar)   │
+        │  padding-bottom= space from bottom(clears controls) │
+        │  ↓ Change 140px (top) or 52px (bottom) as needed ↓  │
+        └─────────────────────────────────────────────────────┘
+        */
+        padding:               140px 10px 52px;  /* ← top: navbar clearance | bottom: control bar */
+        height:                100%;             /* full slide height so image reaches base */
+        gap:                   2px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       TEXT COLUMN (left)
+    ═══════════════════════════════════════════════════════════ */
+    .hs-copy {
+        padding-right: 32px;
+        align-self:    center; /* text stays vertically centered while image grounds at bottom */
+        /* Staggered reveal when slide becomes active */
+        opacity:    0;
+        transform:  translateY(32px);
+        transition: opacity .8s var(--slide-ease) .15s,
+                    transform .8s var(--slide-ease) .15s;
+    }
+    .hs-slide.is-active .hs-copy {
+        opacity:   1;
+        transform: translateY(0);
+    }
+
+    /* ── Pill tag ──────────────────────────────────────────── */
+    .hs-pill {
+        display:        inline-flex;
+        align-items:    center;
+        gap:            8px;
+        padding:        6px 14px 6px 8px;
+        border-radius:  999px;
+        font-size:      11.5px;
+        font-weight:    600;
+        letter-spacing: .6px;
+        text-transform: uppercase;
+        margin-bottom:  24px;
+        border:         1px solid transparent;
+    }
+    .hs-pill.blue    { background:#E8F1FF; color:#1A56E8; border-color:#C0D7FF; }
+    .hs-pill.teal    { background:#E4F9FC; color:#0891B2; border-color:#BAE6F5; }
+    .hs-pill.emerald { background:#ECFDF5; color:#059669; border-color:#A7F3D0; }
+
+    .hs-pill-dot {
+        width:9px; height:9px; border-radius:50%; flex-shrink:0;
+        animation: dotPulse 2s ease-in-out infinite;
+    }
+    .blue    .hs-pill-dot { background:#1A56E8; box-shadow:0 0 0 3px rgba(26,86,232,.2); }
+    .teal    .hs-pill-dot { background:#0891B2; box-shadow:0 0 0 3px rgba(8,145,178,.2); }
+    .emerald .hs-pill-dot { background:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.2); }
+
+    @keyframes dotPulse {
+        0%,100% { box-shadow:0 0 0 3px rgba(26,86,232,.2); }
+        50%     { box-shadow:0 0 0 7px rgba(26,86,232,.0); }
+    }
+
+    /* ── Headline ──────────────────────────────────────────── */
+    .hs-h1 {
+        font-family:    var(--f-main);   /* explicit — never inherits wrong font */
+        font-size:      clamp(38px, 4.6vw, 68px);
+        font-weight:    800;
+        line-height:    1.06;
+        letter-spacing: -1.5px;
+        color:          #0F1C3F;
+        margin-bottom:  20px;
+    }
+    /* Accent coloured word */
+    .hs-h1 em {
+        font-style:    normal;
+        font-weight:   800;
+        display:       inline;
+    }
+    .blue    .hs-h1 em, .hs-h1 em.blue    { color: #1A56E8; }
+    .teal    .hs-h1 em, .hs-h1 em.teal    { color: #0891B2; }
+    .emerald .hs-h1 em, .hs-h1 em.emerald { color: #059669; }
+
+    /* ── Body text ─────────────────────────────────────────── */
+    .hs-body {
+        font-family:   var(--f-main);
+        font-size:     clamp(15px, 1.3vw, 17px);
+        font-weight:   400;
+        line-height:   1.8;
+        color:         #3D4F6B;
+        max-width:     460px;
+        margin-bottom: 36px;
+    }
+
+    /* ── CTA row ───────────────────────────────────────────── */
+    .hs-cta {
+        display:       flex;
+        gap:           14px;
+        flex-wrap:     wrap;
+        margin-bottom: 44px;
+    }
+    .hs-btn {
+        display:         inline-flex;
+        align-items:     center;
+        gap:             9px;
+        padding:         14px 28px;
+        border-radius:   14px;
+        font-family:     var(--f-main);
+        font-size:       15px;
+        font-weight:     600;
+        cursor:          pointer;
+        border:          none;
+        white-space:     nowrap;
+        transition:      transform .22s, box-shadow .22s, background .22s;
+        overflow:        hidden;
+        position:        relative;
+    }
+    /* Filled primary */
+    .hs-btn-primary {
+        background:  #1A56E8;
+        color:       #fff;
+        box-shadow:  0 4px 18px rgba(26,86,232,.30);
+    }
+    .hs-btn-primary:hover { transform:translateY(-3px); box-shadow:0 10px 28px rgba(26,86,232,.40); }
+    .hs-btn-primary i { font-size:13px; transition:transform .2s; }
+    .hs-btn-primary:hover i { transform:translateX(4px); }
+
+    /* Shimmer sweep on hover */
+    .hs-btn-primary::after {
+        content:''; position:absolute; inset:0;
+        background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);
+        transform:translateX(-100%);
+    }
+    .hs-btn-primary:hover::after { animation:shimmer .45s ease forwards; }
+    @keyframes shimmer { to { transform:translateX(120%); } }
+
+    /* Teal + emerald variants */
+    .hs-btn-primary.teal    { background:#0891B2; box-shadow:0 4px 18px rgba(8,145,178,.30); }
+    .hs-btn-primary.teal:hover   { box-shadow:0 10px 28px rgba(8,145,178,.40); }
+    .hs-btn-primary.emerald { background:#059669; box-shadow:0 4px 18px rgba(5,150,105,.30); }
+    .hs-btn-primary.emerald:hover { box-shadow:0 10px 28px rgba(5,150,105,.40); }
+
+    /* Ghost / outline */
+    .hs-btn-ghost {
+        background:  rgba(255,255,255,.65);
+        color:       #0F1C3F;
+        border:      1.5px solid rgba(15,28,63,.14);
+        backdrop-filter: blur(10px);
+    }
+    .hs-btn-ghost:hover { background:rgba(255,255,255,.9); transform:translateY(-2px); }
+
+    /* ── Stats row ─────────────────────────────────────────── */
+    .hs-stats {
+        display:     flex;
+        align-items: center;
+        flex-wrap:   wrap;
+        gap:         0;
+    }
+    .hs-stat {
+        display:        flex;
+        flex-direction: column;
+        gap:            3px;
+        padding:        0 22px;
+    }
+    .hs-stat:first-child { padding-left: 0; }
+    .hs-stat strong {
+        font-family: var(--f-main);
+        font-size:   26px;
+        font-weight: 800;
+        color:       #0F1C3F;
+        line-height: 1;
+    }
+    .hs-stat strong sup {
+        font-size:  13px;
+        font-weight:700;
+        color:      #1A56E8;
+    }
+    .hs-stat span {
+        font-size:      11px;
+        font-weight:    500;
+        color:          #7A8BA4;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+    .hs-stat-sep { width:1px; height:34px; background:rgba(15,28,63,.10); flex-shrink:0; }
+
+    /* ═══════════════════════════════════════════════════════════
+       IMAGE COLUMN (right)
+    ═══════════════════════════════════════════════════════════ */
+    .hs-visual {
+        display:         flex;
+        align-items:     flex-end;   /* image sits at the very base of the hero */
+        justify-content: flex-end;
+        height:          100%;
+        /* Slide-in from right */
+        opacity:    0;
+        transform:  translateX(40px);
+        transition: opacity .8s var(--slide-ease) .25s,
+                    transform .8s var(--slide-ease) .25s;
+    }
+    .hs-slide.is-active .hs-visual { opacity:1; transform:translateX(0); }
+
+    .hs-imgwrap {
+        position: relative;
+        width:    100%;
+        max-width:420px;
+        display:  flex;
+        align-items: flex-end;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    /* Soft blob behind the person image */
+    .hs-blob {
+        position:      absolute;
+        bottom:        -20px;
+        left:          50%;
+        transform:     translateX(-50%);
+        width:         88%;
+        height:        88%;
+        border-radius: 62% 38% 46% 54% / 60% 44% 56% 40%;
+        z-index:       0;
+        animation:     blobMorph 9s ease-in-out infinite;
+        filter:        blur(1px);
+    }
+    .hs-blob.blue    { background:linear-gradient(135deg,#C7DFFF 0%,#E0F0FF 60%,transparent 100%); }
+    .hs-blob.teal    { background:linear-gradient(135deg,#B0EEF8 0%,#DAFAFF 60%,transparent 100%); }
+    .hs-blob.emerald { background:linear-gradient(135deg,#A7F3D0 0%,#D1FAE5 60%,transparent 100%); }
+
+    @keyframes blobMorph {
+        0%,100% { border-radius:62% 38% 46% 54% / 60% 44% 56% 40%; }
+        33%     { border-radius:46% 54% 62% 38% / 40% 56% 44% 60%; }
+        66%     { border-radius:54% 46% 38% 62% / 56% 40% 60% 44%; }
+    }
+
+    /* ── THE PERSON IMAGE ─────────────────────────────────────
+       ★ HOW TO CHANGE THE IMAGE:
+         Replace src="" in the HTML below.
+
+       ★ RECOMMENDED FORMAT:
+         • PNG with transparent background (best — blob shows)
+         • JPG portrait also works perfectly
+         • Ideal size: 600–900px wide, portrait (3:4 ratio)
+
+       ★ TO RESIZE: change --img-h in :root above.
+    ───────────────────────────────────────────────────────── */
+    .hs-img {
+        position:        relative;
+        z-index:         1;
+        display:         block;
+        width:           100%;
+        height:          var(--img-h);          /* ← change --img-h in :root */
+        object-fit:      contain;
+        object-position: center bottom;
+        filter:          drop-shadow(0 32px 48px rgba(15,28,63,.16))
+                         drop-shadow(0 8px 16px rgba(15,28,63,.10));
+        user-select:     none;
+        pointer-events:  none;
+        /* Float animation — continuous gentle rise/fall */
+        animation: imgFloat 5s ease-in-out infinite;
+    }
+    @keyframes imgFloat {
+        0%,100% { transform:translateY(0);   }
+        50%     { transform:translateY(-8px); } /* small lift — image stays near base */
+    }
+
+    /* ── Floating glass chips ─────────────────────────────────
+       Glassmorphism status pills that float beside the image
+    ───────────────────────────────────────────────────────── */
+    .hs-chip {
+        position:        absolute;
+        display:         inline-flex;
+        align-items:     center;
+        gap:             8px;
+        padding:         9px 14px;
+        border-radius:   50px;
+        background:      rgba(255,255,255,.78);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border:          1px solid rgba(255,255,255,.9);
+        box-shadow:      0 6px 24px rgba(15,28,63,.10),
+                         0 1px 4px rgba(15,28,63,.06);
+        font-family:     var(--f-main);
+        font-size:       12px;
+        font-weight:     600;
+        color:           #0F1C3F;
+        white-space:     nowrap;
+        z-index:         3;
+        pointer-events:  none;
+    }
+    .hs-chip-icon {
+        width:26px; height:26px; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        font-size:11px; flex-shrink:0;
+    }
+    .hs-chip-icon.blue    { background:#E8F1FF; color:#1A56E8; }
+    .hs-chip-icon.teal    { background:#E4F9FC; color:#0891B2; }
+    .hs-chip-icon.emerald { background:#ECFDF5; color:#059669; }
+
+    /* Chip positions — 4 chips per slide, all visible inside the image frame */
+    .hs-chip.top  { top:16%;    right:-10px;  animation:chipBob 4.0s ease-in-out infinite 0.6s; }
+    .hs-chip.bot  { bottom:22%; left:-10px;   animation:chipBob 5.0s ease-in-out infinite 1.6s; }
+    .hs-chip.top2 { top:40%;    left:-10px;   animation:chipBob 4.5s ease-in-out infinite 1.1s; }
+    .hs-chip.bot2 { bottom:42%; right:-10px;  animation:chipBob 5.5s ease-in-out infinite 2.1s; }
+
+    @keyframes chipBob {
+        0%,100% { transform:translateY(0);   }
+        50%     { transform:translateY(-9px); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CONTROL BAR (bottom of hero)
+       Progress line + Prev · Dots · Next
+    ═══════════════════════════════════════════════════════════ */
+    .hs-controls {
+        position:    absolute;
+        bottom:      0; left:0; right:0;
+        z-index:     20;
+        background:  rgba(240,247,255,.82);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-top:  1px solid rgba(26,86,232,.09);
+    }
+
+    /* Thin progress bar at very top of control bar */
+    .hs-progress {
+        height:     6px;
+        background: rgba(26,86,232,.10);
+        overflow:   hidden;
+    }
+    .hs-progress-bar {
+        height:     100%;
+        width:      0%;
+        background: linear-gradient(90deg, #1A56E8, #60A5FA);
+        border-radius: 0 2px 2px 0;
+        /* transition duration is set by JS to match --slide-dur */
+        transition: width linear;
+    }
+
+    .hs-nav {
+        display:         flex;
+        align-items:     center;
+        justify-content: center;
+        gap:             18px;
+        padding:         2px 2px;
+    }
+
+    .hs-arrow {
+        width:40px; height:40px; border-radius:10px;
+        border:1.5px solid rgba(26,86,232,.18);
+        background:rgba(255,255,255,.7);
+        backdrop-filter:blur(8px);
+        color:#1A56E8; font-size:13px; cursor:pointer;
+        display:flex; align-items:center; justify-content:center;
+        transition:all .2s; box-shadow:0 1px 4px rgba(26,86,232,.07);
+    }
+    .hs-arrow:hover {
+        background:#1A56E8; color:#fff;
+        transform:scale(1.08);
+        box-shadow:0 4px 14px rgba(26,86,232,.30);
+    }
+
+    .hs-dots { display:flex; align-items:center; gap:8px; }
+    .hs-dot {
+        width:9px; height:9px; border-radius:50%; border:none; padding:0;
+        background:rgba(26,86,232,.20); cursor:pointer;
+        transition:all .3s ease;
+    }
+    .hs-dot:hover { background:rgba(26,86,232,.45); transform:scale(1.3); }
+    .hs-dot.active { width:28px; border-radius:5px; background:#1A56E8; }
+
+    /* ─────────────────────────────────────────────────────────
+       SCROLL CUE (left side vertical)
+    ───────────────────────────────────────────────────────── */
+    .hs-scroll {
+        position:absolute; left:28px; bottom:80px;
+        display:flex; flex-direction:column; align-items:center; gap:9px;
+        z-index:5; pointer-events:none;
+    }
+    .hs-scroll-label {
+        font-family:var(--f-main); font-size:9px; font-weight:600;
+        letter-spacing:3px; text-transform:uppercase; color:#7A8BA4;
+        writing-mode:vertical-lr;
+    }
+    .hs-scroll-line {
+        width:1px;
+        background:linear-gradient(to bottom, #1A56E8, transparent);
+        animation:scrollAnim 2.2s ease-in-out infinite;
+    }
+    @keyframes scrollAnim {
+        0%   { height:0;    opacity:0; }
+        40%  { height:44px; opacity:.7; }
+        80%  { height:44px; opacity:0; }
+        100% { height:0;    opacity:0; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE BREAKPOINTS
+       CRITICAL FIX: on mobile, image is stacked ABOVE text
+       using order:-1 so it's always visible.
+    ═══════════════════════════════════════════════════════════ */
+
+    /* 1440px+ */
+    @media (min-width:1440px) {
+        :root { --img-h: 580px; }
+        .hs-inner { max-width:1400px; padding:0 72px 40px; }
+    }
+
+    /* ≤1280px */
+    @media (max-width:1280px) {
+        :root { --img-h: 480px; }
+        .hs-inner { padding:0 48px 40px; }
+    }
+
+    /* ≤1080px */
+    @media (max-width:1080px) {
+        :root { --img-h: 440px; }
+        .hs-inner { padding:0 36px 40px; }
+        .hs-copy { padding-right:24px; }
+    }
+
+    /* ≤900px — tablet landscape */
+    @media (max-width:900px) {
+        :root { --img-h: 390px; }
+        .hs-inner { grid-template-columns:54fr 46fr; padding:0 28px 52px; }
+        .hs-h1 { font-size: clamp(34px,5.5vw,54px); }
+        .hs-scroll { display:none; }
+    }
+
+    /* ≤768px — TABLET PORTRAIT: STACK IMAGE ABOVE TEXT ─────────
+       The key fix: image column gets order:-1 so it renders
+       first (above) in the stacked layout, guaranteeing the
+       person photo is ALWAYS visible on mobile/tablet.       */
+    @media (max-width:768px) {
+        :root { --img-h: 300px; }
+
+        #hero {
+            height:     auto;
+            min-height: 100svh;
+        }
+
+        .hs-track { position:relative; height:auto; }
+
+        /* Inactive slides — keep them hidden but let active flow naturally */
+        .hs-slide {
+            position:   absolute;
+            inset:      0;
+            min-height: 100svh;
+        }
+        /* Active slide flows normally so page height is correct */
+        .hs-slide.is-active {
+            position: relative;
+            inset:    auto;
+        }
+
+        .hs-inner {
+            grid-template-columns: 1fr;
+            /*
+            ┌──────────────────────────────────────────────────────┐
+            │  MOBILE SPACING — adjust these values manually       │
+            │  padding-top   = how far image drops from top        │
+            │                  increase to push image further down │
+            │  padding-bottom= clears the bottom control bar       │
+            │  ↓ Change 120px (top) or 80px (bottom) as needed ↓   │
+            └──────────────────────────────────────────────────────┘
+            */
+            padding:               120px 20px 80px;  /* ← top: push content below navbar | bottom: control bar */
+            gap:                   0;
+            height:                auto;
+            min-height:            calc(100svh - 70px);
+            align-content:         center;
+        }
+
+        /* ★★★ IMAGE ABOVE TEXT ON MOBILE ★★★ */
+        .hs-visual {
+            order:           -1;        /* moves image above text */
+            justify-content: center;
+            height:          auto;
+            padding-bottom:  8px;
+            opacity:    0;
+            transform:  translateY(-20px);
+            transition: opacity .7s var(--slide-ease) .05s,
+                        transform .7s var(--slide-ease) .05s;
+        }
+        .hs-slide.is-active .hs-visual {
+            opacity:   1;
+            transform: translateY(0);
+        }
+        .hs-imgwrap  { max-width:260px; margin:0 auto; }
+        /* Chips: keep inside the imgwrap bounds, scaled down */
+        .hs-chip     { font-size:10px; padding:6px 10px; gap:5px; }
+        .hs-chip-icon{ width:20px; height:20px; font-size:9px; }
+        .hs-chip.top  { top:10%;    right:-4px; }
+        .hs-chip.bot  { bottom:24%; left:-4px;  }
+        .hs-chip.top2 { top:34%;    left:-4px;  }
+        .hs-chip.bot2 { bottom:44%; right:-4px; }
+
+        /* Text copy — centred below image */
+        .hs-copy     { padding-right:0; text-align:center; transform:translateY(24px); }
+        .hs-pill     { justify-content:center; margin:12px auto 16px; }
+        .hs-h1       { font-size:clamp(32px,8vw,50px); letter-spacing:-1px; }
+        .hs-body     { margin:0 auto 28px; font-size:14.5px; max-width:90%; }
+        .hs-cta      { justify-content:center; margin-bottom:28px; }
+        .hs-stats    { justify-content:center; }
+        .hs-scroll   { display:none; }
+        .hs-nav      { padding:12px 20px; }
+    }
+
+    /* ≤520px */
+    @media (max-width:520px) {
+        :root { --img-h: 260px; }
+        .hs-imgwrap  { max-width:220px; }
+        .hs-h1       { font-size:clamp(28px,9vw,44px); }
+        .hs-stat     { padding:0 14px; }
+        .hs-stat strong { font-size:22px; }
+        .hs-chip     { font-size:9.5px; padding:5px 9px; }
+    }
+
+    /* ≤420px — small phones */
+    @media (max-width:420px) {
+        :root { --img-h: 220px; }
+        .hs-imgwrap  { max-width:185px; }
+        /* Chips: scaled to minimum, stay visible */
+        .hs-chip     { font-size:9px; padding:4px 8px; gap:4px; }
+        .hs-chip-icon{ width:18px; height:18px; font-size:8px; }
+        .hs-cta      { flex-direction:column; align-items:center; }
+        .hs-btn      { width:100%; max-width:260px; justify-content:center; }
+        .hs-stat     { padding:0 10px; }
+        .hs-stat strong { font-size:20px; }
+        .hs-nav      { padding:10px 14px; gap:12px; }
+        .hs-arrow    { width:34px; height:34px; font-size:12px; }
+        .hs-dot      { width:7px; height:7px; }
+        .hs-dot.active { width:22px; }
+    }
+
+    /* Landscape phones */
+    @media (max-height:520px) and (orientation:landscape) {
+        :root { --img-h: 200px; }
+        .hs-slide.is-active { position:relative; }
+        .hs-inner {
+            grid-template-columns: 52fr 48fr;
+            padding: 16px 32px 72px;
+            min-height: auto;
+            align-items: center;
+        }
+        .hs-visual { order:0; justify-content:flex-end; }
+        .hs-copy   { text-align:left; }
+        .hs-pill, .hs-cta, .hs-stats { justify-content:flex-start; }
+        .hs-body   { display:none; }
+        .hs-h1     { font-size:28px; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion:reduce) {
+        #hero::before, .hs-img, .hs-blob, .hs-chip,
+        .hs-scroll-line, .hs-pill-dot { animation:none; }
+        .hs-slide, .hs-copy, .hs-visual { transition:opacity .2s; }
+        .hs-slide.is-active .hs-copy,
+        .hs-slide.is-active .hs-visual { opacity:1; transform:none; }
+        .hs-progress-bar { transition:none; }
+    }

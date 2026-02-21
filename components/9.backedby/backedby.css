@@ -1,0 +1,498 @@
+/* ============================================================
+   backedby.css — Sound Vision · Backed By Section
+   Dark luxury · RAF infinite scroll · all-white logo treatment
+   Namespace: sv-bb-  (zero collision with sv-tm-, sv-aw-)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,600;1,700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+.sv-bb-section {
+    /* Palette — site-coherent dark navy gold */
+    --bb-bg:          #05070E;
+    --bb-bg-strip:    #0A0F1E;
+    --bb-bg-slot:     rgba(255,255,255,0.03);
+    --bb-bg-slot-h:   rgba(255,255,255,0.07);
+
+    --bb-gold:        #D4AF37;
+    --bb-gold-lt:     #F5E27A;
+    --bb-gold-dk:     #A8820A;
+    --bb-gold-dim:    rgba(212,175,55,0.12);
+    --bb-gold-glow:   rgba(212,175,55,0.18);
+
+    --bb-text:        #EEE8D5;
+    --bb-text-muted:  #7A6F5A;
+    --bb-text-soft:   #9A8E78;
+
+    --bb-bdr:         rgba(255,255,255,0.06);
+    --bb-bdr-gold:    rgba(212,175,55,0.20);
+
+    /* Logo rendering — all logos become white via filter */
+    --bb-logo-filter:      brightness(0) invert(1);
+    --bb-logo-opacity:     0.55;
+    --bb-logo-opacity-h:   1;
+
+    --bb-font-disp:   'Cormorant Garamond', Georgia, serif;
+    --bb-font-body:   'Outfit', system-ui, sans-serif;
+
+    --bb-ease:        cubic-bezier(0.4, 0, 0.2, 1);
+    --bb-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+    --bb-out:         cubic-bezier(0, 0, 0.2, 1);
+
+    /* Slot sizing */
+    --bb-slot-w:      200px;
+    --bb-slot-h:      100px;
+    --bb-gap:         32px;
+}
+
+.sv-bb-section *,
+.sv-bb-section *::before,
+.sv-bb-section *::after { box-sizing: border-box; }
+
+/* ══════════════════════════════════════════════
+   SECTION BASE
+══════════════════════════════════════════════ */
+.sv-bb-section {
+    position:    relative;
+    background:  var(--bb-bg);
+    padding:     2px 0 2px;
+    overflow:    hidden;
+    font-family: var(--bb-font-body);
+    color:       var(--bb-text);
+    isolation:   isolate;
+}
+
+/* ══════════════════════════════════════════════
+   ATMOSPHERIC BACKGROUND
+══════════════════════════════════════════════ */
+.sv-bb-bg {
+    position:       absolute;
+    inset:          0;
+    pointer-events: none;
+    z-index:        0;
+    overflow:       hidden;
+}
+
+/* Radial gold halos — left and right */
+.sv-bb-glow {
+    position:      absolute;
+    border-radius: 50%;
+    filter:        blur(130px);
+    will-change:   opacity;
+}
+.sv-bb-glow--l {
+    width:      700px;
+    height:     500px;
+    background: radial-gradient(ellipse, rgba(212,175,55,0.12) 0%, transparent 65%);
+    top:        -100px;
+    left:       -200px;
+    animation:  sv-bb-glow-pulse 13s ease-in-out infinite;
+}
+.sv-bb-glow--r {
+    width:      600px;
+    height:     500px;
+    background: radial-gradient(ellipse, rgba(100,120,255,0.07) 0%, transparent 65%);
+    bottom:     -80px;
+    right:      -150px;
+    animation:  sv-bb-glow-pulse 17s ease-in-out infinite reverse;
+}
+@keyframes sv-bb-glow-pulse {
+    0%,100% { opacity: 0.5; transform: scale(1);    }
+    50%      { opacity: 1;   transform: scale(1.12); }
+}
+
+/* Subtle noise texture for depth */
+.sv-bb-noise {
+    position:   absolute;
+    inset:      0;
+    opacity:    0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px;
+    pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════
+   CONTAINER
+══════════════════════════════════════════════ */
+.sv-bb-container {
+    position:  relative;
+    z-index:   1;
+    max-width: 1480px;
+    margin:    0 auto;
+    padding:   0 10px;
+}
+
+/* ══════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════ */
+.sv-bb-header {
+    text-align:    center;
+    margin-bottom: 64px;
+}
+
+/* Eyebrow label */
+.sv-bb-label {
+    display:       inline-flex;
+    align-items:   center;
+    gap:           16px;
+    margin-bottom: 20px;
+}
+.sv-bb-label-line {
+    display:    block;
+    width:      44px;
+    height:     1px;
+    background: linear-gradient(90deg, transparent, var(--bb-gold), transparent);
+}
+.sv-bb-label-text {
+    font-size:      10.5px;
+    font-weight:    700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color:          var(--bb-gold);
+}
+
+/* Main title */
+.sv-bb-title {
+    font-family:    var(--bb-font-disp);
+    font-size:      clamp(42px, 6vw, 72px);
+    font-weight:    700;
+    color:          #FFFDF5;
+    line-height:    1.08;
+    letter-spacing: -0.5px;
+    margin-bottom:  14px;
+}
+.sv-bb-title-em {
+    font-style: italic;
+    background: linear-gradient(135deg,
+        var(--bb-gold-lt) 0%,
+        var(--bb-gold)    45%,
+        var(--bb-gold-dk) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip:         text;
+    display:                 inline;
+    position:                relative;
+}
+/* Animated underline */
+.sv-bb-title-em::after {
+    content:       '';
+    position:      absolute;
+    left: 0; right: 0;
+    bottom:        2px;
+    height:        2px;
+    background:    linear-gradient(90deg, var(--bb-gold-lt), var(--bb-gold), var(--bb-gold-dk));
+    border-radius: 99px;
+    animation:     sv-bb-ul 3.5s ease-in-out infinite;
+}
+@keyframes sv-bb-ul {
+    0%,100% { opacity: 0.25; transform: scaleX(0.88); }
+    50%      { opacity: 0.75; transform: scaleX(1);    }
+}
+
+.sv-bb-subtitle {
+    font-size:   16px;
+    font-weight: 300;
+    color:       var(--bb-text-soft);
+    line-height: 1.8;
+    max-width:   520px;
+    margin:      0 auto;
+}
+
+/* ══════════════════════════════════════════════
+   DECORATIVE RULE (top & bottom of strip)
+══════════════════════════════════════════════ */
+.sv-bb-rule {
+    display:     flex;
+    align-items: center;
+    gap:         0;
+}
+.sv-bb-rule-line {
+    flex:       1;
+    height:     1px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(212,175,55,0.35) 30%,
+        rgba(212,175,55,0.35) 70%,
+        transparent 100%
+    );
+}
+.sv-bb-rule-diamond {
+    display:       block;
+    width:         8px;
+    height:        8px;
+    background:    var(--bb-gold);
+    transform:     rotate(45deg);
+    opacity:       0.6;
+    flex-shrink:   0;
+    margin:        0 16px;
+    box-shadow:    0 0 8px var(--bb-gold-glow);
+}
+
+/* ══════════════════════════════════════════════
+   STRIP WRAPPER
+══════════════════════════════════════════════ */
+.sv-bb-strip-wrap {
+    display:        flex;
+    flex-direction: column;
+    gap:            0;
+    margin-bottom:  48px;
+}
+
+/* Strip panel — the frosted dark glass band */
+.sv-bb-outer {
+    position:   relative;
+    overflow:   hidden;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.015) 0%,
+        var(--bb-bg-strip)      40%,
+        var(--bb-bg-strip)      60%,
+        rgba(255,255,255,0.015) 100%
+    );
+    border-top:    1px solid var(--bb-bdr);
+    border-bottom: 1px solid var(--bb-bdr);
+
+    /* Side fade masks — logos melt into background */
+    mask-image: linear-gradient(
+        to right,
+        transparent   0%,
+        #000          9%,
+        #000         91%,
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent   0%,
+        #000          9%,
+        #000         91%,
+        transparent 100%
+    );
+}
+
+/*
+   Track:
+   JS RAF drives translateX — NO CSS transition/animation on transform.
+   JS clones all logo slots so you have 2 identical sets for seamless loop.
+*/
+.sv-bb-track {
+    display:     flex;
+    gap:         var(--bb-gap);
+    align-items: center;
+    padding:     36px 0;
+    will-change: transform;
+    /* ⚠ NO transition or animation on transform — breaks RAF loop */
+}
+
+/* ══════════════════════════════════════════════
+   LOGO SLOT
+══════════════════════════════════════════════ */
+.sv-bb-logo-slot {
+    flex:      0 0 var(--bb-slot-w);
+    width:     var(--bb-slot-w);
+    height:    var(--bb-slot-h);
+    position:  relative;
+    flex-shrink: 0;
+}
+
+/* Wrapper — <a> or <div> */
+.sv-bb-logo-wrap {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    width:           100%;
+    height:          100%;
+    border-radius:   14px;
+    border:          1px solid transparent;
+    background:      var(--bb-bg-slot);
+    padding:         20px 24px;
+    cursor:          default;
+    text-decoration: none;
+    position:        relative;
+    overflow:        hidden;
+
+    transition:
+        background    0.38s var(--bb-ease),
+        border-color  0.38s var(--bb-ease),
+        transform     0.38s var(--bb-spring),
+        box-shadow    0.38s var(--bb-ease);
+}
+/* If it's a link, change cursor */
+a.sv-bb-logo-wrap { cursor: pointer; }
+
+/* Slot inner top highlight */
+.sv-bb-logo-wrap::before {
+    content:        '';
+    position:       absolute;
+    top: 0; left: 10%; right: 10%;
+    height:         1px;
+    background:     linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
+    pointer-events: none;
+}
+
+/* Hover state on logo slot */
+.sv-bb-logo-wrap:hover {
+    background:   var(--bb-bg-slot-h);
+    border-color: var(--bb-bdr-gold);
+    transform:    translateY(-6px) scale(1.04);
+    box-shadow:
+        0 12px 32px rgba(0,0,0,0.5),
+        0 0 20px var(--bb-gold-dim),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Gold shimmer sweep on hover */
+.sv-bb-logo-wrap::after {
+    content:        '';
+    position:       absolute;
+    inset:          0;
+    background:     linear-gradient(
+        105deg,
+        transparent        30%,
+        rgba(212,175,55,0.08) 50%,
+        transparent        70%
+    );
+    transform:      translateX(-120%);
+    pointer-events: none;
+    border-radius:  inherit;
+}
+.sv-bb-logo-wrap:hover::after {
+    animation: sv-bb-shimmer 0.6s var(--bb-ease) forwards;
+}
+@keyframes sv-bb-shimmer {
+    from { transform: translateX(-120%); }
+    to   { transform: translateX(120%);  }
+}
+
+/* ══════════════════════════════════════════════
+   LOGO IMAGE
+   All logos — black, white, or color — are
+   converted to white via CSS filter so they
+   read perfectly on the dark background.
+   Hover restores full brightness.
+══════════════════════════════════════════════ */
+.sv-bb-logo-img {
+    max-width:  100%;
+    max-height: 80px;
+    width:      auto;
+    height:     auto;
+    object-fit: contain;
+    display:    block;
+    user-select: none;
+    pointer-events: none;
+
+    /* White rendering — works for black logos, white logos, and colorful logos */
+    filter:     var(--bb-logo-filter);
+    opacity:    var(--bb-logo-opacity);
+    transition:
+        opacity  0.35s var(--bb-ease),
+        filter   0.35s var(--bb-ease),
+        transform 0.4s var(--bb-spring);
+}
+.sv-bb-logo-wrap:hover .sv-bb-logo-img {
+    opacity:  var(--bb-logo-opacity-h);
+    filter:   brightness(0) invert(1) drop-shadow(0 0 8px rgba(212,175,55,0.5));
+    transform: scale(1.06);
+}
+
+/* Fallback text (when image fails to load) */
+.sv-bb-logo-fallback {
+    font-family:    var(--bb-font-body);
+    font-size:      50px;
+    font-weight:    700;
+    color:          rgba(255,255,255,0.4);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align:     center;
+    line-height:    1.3;
+}
+
+/* ══════════════════════════════════════════════
+   FOOTER HINT
+══════════════════════════════════════════════ */
+.sv-bb-footer-hint {
+    text-align:     center;
+    font-size:      12px;
+    font-weight:    500;
+    color:          var(--bb-text-muted);
+    letter-spacing: 0.4px;
+    margin:         0;
+    display:        flex;
+    align-items:    center;
+    justify-content: center;
+    gap:            10px;
+}
+.sv-bb-pulse {
+    display:       inline-block;
+    width:         7px;
+    height:        7px;
+    border-radius: 50%;
+    background:    var(--bb-gold);
+    animation:     sv-bb-pulse 2.4s ease-in-out infinite;
+    flex-shrink:   0;
+}
+@keyframes sv-bb-pulse {
+    0%,100% { opacity: 0.3; transform: scale(1);   box-shadow: none; }
+    50%      { opacity: 1;   transform: scale(1.5); box-shadow: 0 0 8px var(--bb-gold-glow); }
+}
+
+/* ══════════════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════════════ */
+[data-bb-reveal] {
+    opacity:   0;
+    transform: translateY(32px);
+    transition: opacity 0.9s var(--bb-out), transform 0.9s var(--bb-out);
+}
+[data-bb-reveal].sv-bb-in {
+    opacity:   1;
+    transform: translateY(0);
+}
+[data-bb-reveal]:nth-child(2) { transition-delay: 0.14s; }
+[data-bb-reveal]:nth-child(3) { transition-delay: 0.28s; }
+
+/* ══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 1200px) {
+    .sv-bb-section { --bb-slot-w: 180px; --bb-slot-h: 90px; }
+}
+@media (max-width: 900px) {
+    .sv-bb-section { --bb-slot-w: 160px; --bb-slot-h: 84px; --bb-gap: 24px; }
+    .sv-bb-container { padding: 0 28px; }
+    .sv-bb-header { margin-bottom: 52px; }
+    .sv-bb-title { font-size: clamp(36px, 7vw, 56px); }
+    .sv-bb-logo-img { max-height: 40px; }
+}
+@media (max-width: 640px) {
+    .sv-bb-section {
+        padding:     20px 0 20px;
+        --bb-slot-w: 140px;
+        --bb-slot-h: 76px;
+        --bb-gap:    16px;
+    }
+    .sv-bb-container { padding: 0 20px; }
+    .sv-bb-header    { margin-bottom: 44px; }
+    .sv-bb-title     { font-size: 38px; }
+    .sv-bb-subtitle  { font-size: 14px; }
+    .sv-bb-logo-img  { max-height: 34px; }
+    .sv-bb-logo-wrap { padding: 16px 18px; }
+    .sv-bb-rule-diamond { display: none; }
+}
+@media (max-width: 420px) {
+    .sv-bb-section { --bb-slot-w: 120px; --bb-slot-h: 68px; --bb-gap: 12px; }
+    .sv-bb-logo-img { max-height: 28px; }
+}
+
+/* ══════════════════════════════════════════════
+   REDUCED MOTION
+══════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    [data-bb-reveal] { transition: none; opacity: 1; transform: none; }
+    .sv-bb-glow--l,
+    .sv-bb-glow--r,
+    .sv-bb-title-em::after,
+    .sv-bb-pulse     { animation: none; opacity: 0.6; }
+}

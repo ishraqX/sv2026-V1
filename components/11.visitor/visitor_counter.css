@@ -1,0 +1,209 @@
+/* ============================================================
+   visitor_counter.css — Sound Vision Visitor Ribbon
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+/* ── Reset ── */
+.sv-ribbon *, .sv-ribbon *::before, .sv-ribbon *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* ── Ribbon Container ── */
+.sv-ribbon {
+    width: 100%;
+    background: linear-gradient(90deg, #0a0a0f 0%, #111827 40%, #0d1117 100%);
+    border-bottom: 1px solid rgba(99,179,237,0.15);
+    border-top: 2px solid #3b82f6;
+    font-family: 'DM Sans', sans-serif;
+    position: relative;
+    overflow: hidden;
+    z-index: 999;
+    
+}
+
+/* Animated shimmer line */
+.sv-ribbon::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(59,130,246,0.06), transparent);
+    animation: sv-shimmer 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes sv-shimmer {
+    0%   { left: -100%; }
+    100% { left: 200%; }
+}
+
+/* ── Inner Flex Row ── */
+.sv-ribbon-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 0 24px;
+    height: 52px;
+    max-width: 1600px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* ── Brand Tag ── */
+.sv-ribbon-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 20px;
+    flex-shrink: 0;
+}
+
+.sv-ribbon-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 6px #22c55e, 0 0 12px rgba(34,197,94,0.4);
+    animation: sv-blink 2s ease-in-out infinite;
+}
+
+@keyframes sv-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
+
+.sv-ribbon-brand-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #3b82f6;
+    text-transform: uppercase;
+}
+
+/* ── Divider ── */
+.sv-ribbon-divider {
+    width: 1px;
+    height: 28px;
+    background: rgba(255,255,255,0.08);
+    margin: 0 20px;
+    flex-shrink: 0;
+}
+
+/* ── Stat Item ── */
+.sv-ribbon-stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.sv-ribbon-icon {
+    font-size: 16px;
+    line-height: 1;
+    position: relative;
+}
+
+.sv-ribbon-stat-body {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.sv-ribbon-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: 0.5px;
+}
+
+.sv-ribbon-lbl {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Online pulse */
+.sv-pulse {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    position: relative;
+}
+
+.sv-pulse::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: rgba(34,197,94,0.25);
+    animation: sv-pulse-ring 1.5s ease-out infinite;
+}
+
+@keyframes sv-pulse-ring {
+    0%   { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(2);   opacity: 0; }
+}
+
+.sv-online-num { color: #22c55e; }
+
+/* ── Right Section (Dashboard Button) ── */
+.sv-ribbon-right {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    flex-shrink: 0;
+}
+
+.sv-dash-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    border: 1px solid rgba(96,165,250,0.3);
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.35);
+}
+
+.sv-dash-btn:hover {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(37,99,235,0.5);
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .sv-ribbon-today { display: none; }
+    .sv-ribbon-inner { padding: 0 16px; gap: 0; }
+    .sv-ribbon-divider { margin: 0 12px; }
+    .sv-ribbon-right { right: 16px; }
+    .sv-dash-btn { padding: 5px 10px; font-size: 11px; gap: 4px; }
+    .sv-dash-txt { display: none; } /* hide "Dashboard" text, keep icon only */
+}
+
+@media (max-width: 640px) {
+    .sv-ribbon-brand-text { display: none; }
+    .sv-ribbon-stat:nth-child(7) { display: none; } /* country */
+    .sv-ribbon-divider { margin: 0 8px; }
+    .sv-ribbon-num { font-size: 13px; }
+    .sv-ribbon-right { right: 8px; }
+    .sv-dash-btn { padding: 4px 8px; font-size: 11px; }
+}

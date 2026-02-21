@@ -1,0 +1,228 @@
+/* app-download.css */
+/* ========================================= */
+/* Isolated Style - Download Section         */
+/* ========================================= */
+
+.sp-dl-wrapper {
+    padding: 80px 0;
+    background: #ffffff;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: #1d1d1f;
+}
+
+.sp-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 30px;
+}
+
+/* Left Content Styles */
+.sp-content-col { flex: 1.2; }
+
+.sp-pre-title {
+    font-weight: 600;
+    font-size: 16px;
+    color: #1d1d1f;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.sp-main-title {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    letter-spacing: -1.5px;
+}
+
+.sp-accent { color: #8b8bff; } /* Light purple/blue from image */
+
+.sp-sub-text {
+    font-size: 15px;
+    color: #86868b;
+    max-width: 450px;
+    line-height: 1.6;
+    margin-bottom: 35px;
+}
+
+/* Reference Image Button Style */
+.sp-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.sp-btn-primary {
+    background: #1d1d1f;
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: 0.3s;
+}
+
+.sp-btn-line {
+    width: 1px;
+    height: 20px;
+    background: rgba(255,255,255,0.2);
+}
+
+.sp-btn-label { font-weight: 600; font-size: 15px; }
+
+.sp-video-cta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sp-play-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 1px solid #d2d2d7;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sp-video-text { display: flex; flex-direction: column; font-size: 13px; }
+.sp-video-text strong { color: #1d1d1f; }
+.sp-video-text span { color: #86868b; }
+
+/* ========================================= */
+/* Right Visual Styles - UPDATED with image  */
+/* ========================================= */
+
+.sp-visual-col {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sp-floating-container {
+    position: relative;
+    width: 350px;
+    height: 350px;
+}
+
+.sp-circle-bg {
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    background: #eef2ff; /* Soft blue circle */
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+
+.sp-glass-mockup {
+    position: relative;
+    z-index: 2;
+    width: 680px;
+    height: 350px;
+    
+  
+    
+    margin: 0px 0px 0px -180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    animation: spFloat 4s ease-in-out infinite;
+}
+
+/* ===== NEW: Sunglass image styling with easy variables ===== */
+.sp-glass-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sp-sunglass-image {
+    /* ---- EASY TO CHANGE: IMAGE SIZE ---- */
+    /* Adjust these percentage values to resize the image */
+    --image-width: 95%;
+    --image-height: 95%;
+    
+    width: var(--image-width);
+    height: var(--image-height);
+    max-width: 520px;  /* Optional max limit */
+    max-height: 320px; /* Optional max limit */
+    object-fit: contain;
+    display: block;
+    
+    /* Visual styling */
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
+    border-radius: 16px;
+    transition: transform 0.3s ease;
+    
+    /* ---- EASY TO CHANGE: IMAGE ANIMATION ---- */
+    /* Option 1: Gentle pulse (default) */
+    animation: imagePulse 3s ease-in-out infinite;
+    
+    /* Option 2: Subtle float - uncomment to use instead */
+    /* animation: imageFloat 4s ease-in-out infinite; */
+    
+    /* Option 3: No animation - comment out animation line */
+}
+
+/* Pulse animation - soft scale effect */
+@keyframes imagePulse {
+    0%, 100% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
+    }
+    50% { 
+        transform: scale(1.03); 
+        filter: drop-shadow(0 12px 24px rgba(0,0,0,0.2));
+    }
+}
+
+/* Alternative float animation */
+@keyframes imageFloat {
+    0%, 100% { 
+        transform: translateY(0); 
+    }
+    50% { 
+        transform: translateY(-5px); 
+    }
+}
+
+/* Hide old graphic */
+.sp-lens-graphic {
+    display: none;
+}
+
+/* Animations & Decors */
+@keyframes spFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+.sp-decor { position: absolute; z-index: 3; font-size: 20px; }
+.sp-star-1 { top: 20%; right: 10%; color: #8b8bff; }
+.sp-star-2 { top: 15%; right: 25%; color: #4ade80; }
+.sp-waves { bottom: 20%; left: 0%; color: #f87171; font-size: 30px; }
+
+@media (max-width: 900px) {
+    .sp-container { flex-direction: column; text-align: center; }
+    .sp-sub-text { margin: 0 auto 30px; }
+    .sp-cta-group { justify-content: center; }
+    .sp-visual-col { justify-content: center; }
+}
+
+/* ========================================= */
+/* End of app-download.css                    */
+/* ========================================= */
