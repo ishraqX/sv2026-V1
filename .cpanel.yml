@@ -1,0 +1,14 @@
+---
+# .cpanel.yml — Deployment config for Sound Vision website
+
+version: 2
+
+deployment:
+  tasks:
+    - export DEPLOY_DIR=/home/soundvis/public_html
+
+    # Copy all files from the repository to public_html
+    - /bin/cp -r * $DEPLOY_DIR
+
+    # Optional: remove the .git folder from deployed site
+    - /bin/rm -rf $DEPLOY_DIR/.git
