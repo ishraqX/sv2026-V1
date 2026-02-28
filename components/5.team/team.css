@@ -79,7 +79,7 @@
 .sv-tm-section {
     position:   relative;
     background: var(--tm-bg-sect);
-    padding:    30px 0 30px;
+    padding:    60px 0 50px;
     overflow:   hidden;
     font-family: var(--tm-f-body);
     font-size:  16px;
@@ -167,7 +167,7 @@
 ══════════════════════════════════════════ */
 .sv-tm-header {
     text-align:    center;
-    /*margin-bottom: 84px;*/
+    margin-bottom: 40px;
 }
 
 /* Eyebrow */
@@ -175,7 +175,7 @@
     display:     inline-flex;
     align-items: center;
     gap:         14px;
-    margin-bottom: 26px;
+    margin-bottom: 16px;
 }
 .sv-tm-eyebrow-line {
     display:    block;
@@ -199,7 +199,7 @@
     font-weight:    700;
     line-height:    1.1;
     letter-spacing: -1px;
-    margin-bottom:  20px;
+    margin-bottom:  14px;
     color:          var(--tm-text-h);
 }
 /* Normal (non-accent) words in the title — explicit white */
@@ -237,7 +237,7 @@
     font-weight: 400;
     color:       var(--tm-text-s);   /* #8BBCDC — clearly readable */
     max-width:   580px;
-    margin:      0 auto 44px;
+    margin:      0 auto 28px;
     line-height: 1.8;
 }
 
@@ -287,7 +287,7 @@
 .sv-tm-layout {
     display:               grid;
     grid-template-columns: var(--tm-cw) 1fr;
-    gap:                   56px;
+    gap:                   36px;
     align-items:           start;
 }
 
@@ -640,7 +640,7 @@
 .sv-tm-scroll-col {
     display:        flex;
     flex-direction: column;
-    gap:            20px;
+    gap:            12px;
     min-width:      0;
 }
 
@@ -671,7 +671,7 @@
     display:     flex;
     gap:         var(--tm-gap);
     align-items: stretch;
-    padding:     32px 0;       /* breathing room top/bottom */
+    padding:     20px 0;       /* breathing room for hover lift */
     will-change: transform;
 }
 
@@ -701,6 +701,10 @@
     border-color: var(--tm-bdr-md);
     z-index:      30;
 }
+.sv-tm-card:focus-visible {
+    outline:        2px solid var(--tm-teal);
+    outline-offset: 3px;
+}
 
 /* Inner top light line — gives the "lifted panel" look */
 .sv-tm-card::before {
@@ -712,6 +716,47 @@
     z-index:       5;
     pointer-events: none;
 }
+
+/* ── Shine sweep on hover (matches award card feel) ── */
+.sv-tm-card-shine {
+    position:       absolute; inset: 0;
+    background: linear-gradient(105deg,
+        transparent 28%,
+        rgba(0,201,174,0.10) 50%,
+        transparent 72%
+    );
+    transform:      translateX(-110%);
+    pointer-events: none;
+    z-index:        6;
+}
+.sv-tm-card:hover .sv-tm-card-shine {
+    animation: sv-tm-shine 0.62s var(--tm-ease) forwards;
+}
+@keyframes sv-tm-shine {
+    from { transform: translateX(-110%); }
+    to   { transform: translateX(210%);  }
+}
+
+/* ── Teal border glow on hover — mask-composite trick ── */
+.sv-tm-card-border {
+    position:       absolute; inset: -1px;
+    border-radius:  21px;
+    pointer-events: none;
+    z-index:        7;
+    background: linear-gradient(135deg,
+        rgba(0,201,174,0.55),
+        rgba(68,136,255,0.12) 50%,
+        rgba(0,201,174,0.55)
+    ) border-box;
+    border: 1px solid transparent;
+    -webkit-mask:           linear-gradient(#fff 0 0) padding-box,
+                            linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite:         exclude;
+    opacity:    0;
+    transition: opacity 0.30s var(--tm-ease);
+}
+.sv-tm-card:hover .sv-tm-card-border { opacity: 1; }
 
 /* Photo — takes up most of the card */
 .sv-tm-card-photo {
@@ -781,10 +826,10 @@
 .sv-tm-card-body {
     flex-shrink:    0;
     height:         210px;
-    padding:        18px 18px 16px;
+    padding:        14px 16px 12px;
     display:        flex;
     flex-direction: column;
-    gap:            10px;
+    gap:            7px;
     background:     var(--tm-bg-card);
     position:       relative;
     z-index:        3;
@@ -835,10 +880,10 @@
     text-decoration: none;
     letter-spacing:  0.3px;
     opacity:         0;
-    transform:       translateY(6px);
+    transform:       translateY(5px);
     transition:
-        opacity   0.25s var(--tm-ease),
-        transform 0.25s var(--tm-ease);
+        opacity   0.20s var(--tm-ease),
+        transform 0.20s var(--tm-ease);
 }
 .sv-tm-card:hover .sv-tm-card-link-btn {
     opacity:   1;
@@ -953,7 +998,7 @@
     }
     .sv-tm-layout    { grid-template-columns: var(--tm-cw) 1fr; gap: 32px; }
     .sv-tm-container { padding: 0 28px; }
-    .sv-tm-header    { margin-bottom: 56px; }
+    .sv-tm-header    { margin-bottom: 36px; }
     .sv-tm-ceo-frame { width: var(--tm-cw); height: calc(var(--tm-ch) + 28px); }
     .sv-tm-card-body { height: 185px; padding: 13px 14px 11px; }
 }
@@ -966,7 +1011,7 @@
         --tm-ceo-body-h:  190px;
         --tm-gap:         20px;
     }
-    .sv-tm-layout    { grid-template-columns: 1fr; gap: 40px; }
+    .sv-tm-layout    { grid-template-columns: 1fr; gap: 24px; }
     .sv-tm-ceo-col   { max-width: var(--tm-cw); margin: 0 auto; }
     .sv-tm-ceo-frame { width: var(--tm-cw); height: calc(var(--tm-ch) + 28px); }
     /* Disable hover lift on single-col — prevents visual jump */
@@ -977,15 +1022,40 @@
 /* ── ≤ 700px : mobile ── */
 @media (max-width: 700px) {
     .sv-tm-section   {
-        padding:          72px 0 56px;
+        padding:          48px 0 40px;
         --tm-cw:          220px;
         --tm-ch:          400px;
         --tm-ceo-body-h:  175px;
         --tm-gap:         16px;
     }
     .sv-tm-container { padding: 0 20px; }
-    .sv-tm-header    { margin-bottom: 52px; }
-    .sv-tm-stats-row { padding: 14px 24px; gap: 22px; }
+    .sv-tm-header    { margin-bottom: 32px; }
+
+    /* Stats row — single row, no wrap, fills container width */
+    .sv-tm-stats-row {
+        display:       flex;          /* block flex → full width */
+        flex-wrap:     nowrap;        /* NEVER wrap */
+        justify-content: center;
+        align-items:   center;
+        gap:           0;             /* remove gap; separators handle spacing */
+        padding:       14px 16px;
+        border-radius: 20px;
+        width:         100%;
+        box-sizing:    border-box;
+    }
+    /* Each stat takes equal share of the row */
+    .sv-tm-stat-item {
+        flex:       1;
+        min-width:  0;
+        padding:    0 8px;
+    }
+    /* Numbers — smaller so 3 fit comfortably */
+    .sv-tm-stat-n   { font-size: 24px; }
+    /* Labels — tighter tracking to fit on one line */
+    .sv-tm-stat-l   { font-size: 10px; letter-spacing: 0.6px; }
+    /* Separators — keep visible, adjust height */
+    .sv-tm-stat-sep { flex-shrink: 0; height: 36px; }
+
     .sv-tm-ceo-frame { width: var(--tm-cw); height: calc(var(--tm-ch) + 28px); }
     .sv-tm-ceo-card:hover { transform: none; box-shadow: var(--tm-sh-ceo); }
     .sv-tm-card-body { height: 175px; padding: 12px 13px 10px; }
@@ -1000,9 +1070,113 @@
         --tm-gap:         14px;
     }
     .sv-tm-title     { font-size: 46px; }
-    .sv-tm-stats-row { flex-wrap: wrap; border-radius: 18px; gap: 16px; }
-    .sv-tm-stat-sep  { display: none; }
+
+    /* Stats row — still single row at 480px */
+    .sv-tm-stats-row {
+        display:         flex;
+        flex-wrap:       nowrap;   /* single row always */
+        justify-content: center;
+        padding:         12px 12px;
+        gap:             0;
+        border-radius:   18px;
+        width:           100%;
+        box-sizing:      border-box;
+    }
+    .sv-tm-stat-item {
+        flex:      1;
+        min-width: 0;
+        padding:   0 6px;
+    }
+    .sv-tm-stat-n   { font-size: 22px; }
+    .sv-tm-stat-l   { font-size: 9px; letter-spacing: 0.4px; }
+    /* Keep separator — hide only below 360px */
+    .sv-tm-stat-sep { flex-shrink: 0; height: 30px; }
+
     .sv-tm-ceo-frame { width: var(--tm-cw); height: calc(var(--tm-ch) + 28px); }
     .sv-tm-ceo-card:hover { transform: none; box-shadow: var(--tm-sh-ceo); }
     .sv-tm-card-body { height: 155px; padding: 11px 12px 10px; }
+}
+
+/* ── ≤ 360px : very small phones ── */
+@media (max-width: 360px) {
+    .sv-tm-stats-row {
+        padding: 10px 8px;
+    }
+    .sv-tm-stat-n   { font-size: 20px; }
+    .sv-tm-stat-l   { font-size: 8.5px; letter-spacing: 0.3px; }
+    .sv-tm-stat-sep { display: none; }   /* only hide sep at truly tiny sizes */
+    .sv-tm-stat-item { padding: 0 4px; }
+}
+/* ══════════════════════════════════════════
+   MANUAL SCROLL ARROWS  (v5)
+   Injected by JS into .sv-tm-scroll-col.
+   Positioned at the vertical mid of the
+   scroll track outer wrapper.
+══════════════════════════════════════════ */
+.sv-tm-arrow {
+    position:        absolute;
+    top:             50%;
+    transform:       translateY(-50%);
+    z-index:         20;
+    width:           44px;
+    height:          44px;
+    border-radius:   50%;
+    border:          1px solid rgba(0,201,174,0.28);
+    background:      rgba(6,12,24,0.82);
+    backdrop-filter: blur(12px);
+    color:           var(--tm-teal);
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    cursor:          pointer;
+    transition:
+        background   0.22s var(--tm-ease),
+        border-color 0.22s var(--tm-ease),
+        transform    0.28s var(--tm-spring),
+        box-shadow   0.22s var(--tm-ease);
+    box-shadow:      0 2px 12px rgba(0,0,0,0.5);
+    /* Don't interfere with the scroll track */
+    pointer-events: auto;
+    flex-shrink:    0;
+}
+.sv-tm-arrow svg {
+    width:  18px;
+    height: 18px;
+    display: block;
+}
+.sv-tm-arrow--prev { left:  -22px; }
+.sv-tm-arrow--next { right: -22px; }
+
+.sv-tm-arrow:hover {
+    background:   rgba(0,201,174,0.18);
+    border-color: rgba(0,201,174,0.65);
+    box-shadow:   0 0 20px rgba(0,201,174,0.25),
+                  0 2px 12px rgba(0,0,0,0.5);
+    transform:    translateY(-50%) scale(1.1);
+}
+.sv-tm-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Drag cursor while dragging */
+.sv-tm-dragging,
+.sv-tm-dragging * {
+    cursor: grabbing !important;
+    user-select: none;
+}
+.sv-tm-scroll-outer {
+    cursor: grab;
+}
+
+/* On mobile — arrows closer in since outer is full width */
+@media (max-width: 700px) {
+    .sv-tm-arrow        { width: 38px; height: 38px; }
+    .sv-tm-arrow svg    { width: 16px; height: 16px; }
+    .sv-tm-arrow--prev  { left:  -4px; }
+    .sv-tm-arrow--next  { right: -4px; }
+}
+@media (max-width: 480px) {
+    .sv-tm-arrow        { width: 34px; height: 34px; }
+    .sv-tm-arrow--prev  { left:  0px; }
+    .sv-tm-arrow--next  { right: 0px; }
 }

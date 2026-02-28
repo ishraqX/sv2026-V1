@@ -1,40 +1,47 @@
-<!-- about.php -->
+<?php
+// about.php - cleaned up: reference actual image file and remove diagnostics
+// The actual image file in this folder is `aboutus.JPG` (uppercase extension).
+$image_src = 'components/7.about/aboutus.JPG';
+$local_path = __DIR__ . '/aboutus.JPG';
+$file_exists = file_exists($local_path) && is_readable($local_path);
+?>
+
 <section class="about-section" id="about">
     <div class="container">
+        <!-- About image: using the actual file in this component folder -->
+        <?php if (!$file_exists): ?>
+        <div style="margin-bottom:20px;padding:12px;background:#ffebee;border-left:4px solid #f44336;">
+            ⚠️ About image not found or unreadable at <strong>components/7.about/aboutus.JPG</strong> — upload the image or check permissions (644).
+        </div>
+        <?php endif; ?>
+
         <div class="about-wrapper">
             <div class="about-image">
-                <!-- FIXED: Added proper path and fallback -->
-                <?php
-                /*
-                 * ROBUST IMAGE PATH — works regardless of include depth or OS.
-                 *
-                 * Strategy:
-                 *   1. Get absolute server path of THIS file's directory (__DIR__)
-                 *   2. Get absolute server path of the web root (DOCUMENT_ROOT)
-                 *   3. Both are normalized with realpath() + forward slashes
-                 *      so Windows backslashes and symlinks don't break the match.
-                 *   4. Subtract root from dir → web-root-relative URL path.
-                 *   5. Append the filename.
-                 *
-                 * Result example:
-                 *   __DIR__       = /var/www/html/components/about
-                 *   DOCUMENT_ROOT = /var/www/html
-                 *   $about_img_path = /components/about/aboutus.jpg   ✓
-                 */
-                $_ab_dir  = rtrim(str_replace('\\', '/', realpath(__DIR__)), '/');
-                $_ab_root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'])), '/');
-                $about_img_path = str_replace($_ab_root, '', $_ab_dir) . '/aboutus.jpg';
-
-                // Check if the file actually exists on disk (helps with debugging)
-                $_ab_file_exists = file_exists(__DIR__ . '/aboutus.jpg');
-                ?>
-                <!-- DEBUG (remove after confirming image loads):
-                     File exists on disk: <?= $_ab_file_exists ? 'YES ✓' : 'NO ✗ — aboutus.jpg not found in ' . __DIR__ ?>
-                     Resolved src: <?= htmlspecialchars($about_img_path) ?>
-                -->
-                <img src="<?= htmlspecialchars($about_img_path) ?>"
-                     alt="Sound Vision Team"
-                     onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%230d1220%22/%3E%3Ctext x=%2250%25%22 y=%2246%25%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%23D4AF37%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3ESound Vision Team%3C/text%3E%3Ctext x=%2250%25%22 y=%2256%25%22 font-family=%22sans-serif%22 font-size=%2213%22 fill=%22%237A6F5A%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EImage not found%3C/text%3E%3C/svg%3E'">
+                <!-- Try multiple image sources with fallbacks -->
+                <img
+                    src="<?= htmlspecialchars($image_src) ?>"
+                    alt="Sound Vision Team"
+                    onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%230d1220%22/%3E%3Ctext x=%2250%25%22 y=%2246%25%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%23D4AF37%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3ESound Vision Team%3C/text%3E%3Ctext x=%2250%25%22 y=%2256%25%22 font-family=%22sans-serif%22 font-size=%2213%22 fill=%22%237A6F5A%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EImage not found%3C/text%3E%3C/svg%3E'; console.log('Image failed to load: ' + this.src);"
+                    style="max-width:100%; border: <?= $file_exists ? '2px solid green' : '2px solid red' ?>;"
+                >
+                
+                <!-- Show base64 if file exists but not loading -->
+                <?php if ($file_exists && $is_readable && $file_size > 0): ?>
+                <div style="margin-top: 10px; padding: 10px; background: #e8f5e8; border-left: 4px solid #4caf50;">
+                    ✅ Image file exists on server at <code><?= $full_image_path ?></code> (<?= round($file_size/1024, 2) ?> KB)<br>
+                    But might not be accessible via URL. Check file permissions (should be 644).
+                </div>
+                <?php elseif ($file_exists && !$is_readable): ?>
+                <div style="margin-top: 10px; padding: 10px; background: #fff3e0; border-left: 4px solid #ff9800;">
+                    ⚠️ Image exists but is NOT READABLE. Fix permissions: <code>chmod 644 <?= $full_image_path ?></code>
+                </div>
+                <?php elseif (!$file_exists): ?>
+                <div style="margin-top: 10px; padding: 10px; background: #ffebee; border-left: 4px solid #f44336;">
+                    ❌ Image NOT FOUND at: <code><?= $full_image_path ?></code><br>
+                    Upload the image to this location or update the path.
+                </div>
+                <?php endif; ?>
+                
                 <div class="about-stats">
                     <div class="stat-card">
                         <h3>500K+</h3>
@@ -103,5 +110,14 @@
     </div>
 </section>
 
-<!-- Add Font Awesome if not already included -->
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+/* Temporary diagnostic styles */
+.about-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+</style>

@@ -235,3 +235,113 @@
 2026-02-21 22:17:24|127.0.0.1|Localhost|LO|Local|Dev|Desktop|Windows 10/11|Chrome|Direct|/svv/
 2026-02-21 22:17:47|127.0.0.1|Localhost|LO|Local|Dev|Desktop|Windows 10/11|Chrome|Direct|/svv/
 2026-02-21 22:18:41|127.0.0.1|Localhost|LO|Local|Dev|Desktop|Windows 10/11|Chrome|Direct|/svv/
+2026-02-21 22:33:04|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:33:22|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-21 22:35:01|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-21 22:36:01|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:42:23|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:46:10|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:46:15|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:46:23|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Linux|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:46:25|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Linux|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:46:29|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Linux|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:46:36|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Linux|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:52:50|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:53:07|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-21 22:53:24|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-21 22:53:40|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-21 22:54:27|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-21 22:55:04|202.134.11.227|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 06:35:47|156.59.195.228|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 06:47:07|156.59.195.228|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-22 07:02:46|91.134.43.152|France|FR|Paris|Île-de-France|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 07:03:35|156.59.195.228|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-22 07:11:38|38.95.13.139|United States|US|Tampa|Florida|Mobile|Android|Chrome|Direct|/
+2026-02-22 07:46:11|95.143.63.15|Switzerland|CH|Zurich|Zurich|Mobile|Android|Chrome|Direct|/
+2026-02-22 07:59:32|23.27.145.6|United States|US|San Jose|California|Desktop|Linux|Firefox|Direct|/
+2026-02-22 08:33:47|95.143.63.15|Switzerland|CH|Zurich|Zurich|Mobile|Android|Chrome|Direct|/
+2026-02-22 12:37:43|23.27.145.122|United States|US|San Jose|California|Desktop|Linux|Firefox|Direct|/
+2026-02-22 13:48:58|46.101.226.196|Germany|DE|Frankfurt am Main|Hesse|Desktop|Linux|Chrome|Direct|/
+2026-02-22 13:48:58|46.101.226.196|Germany|DE|Frankfurt am Main|Hesse|Desktop|Linux|Firefox|Direct|/
+2026-02-22 18:04:08|35.185.227.118|United States|US|The Dalles|Oregon|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 18:30:43|18.207.200.83|United States|US|Ashburn|Virginia|Desktop|Unknown|Unknown|Direct|/
+2026-02-22 18:30:43|18.207.200.83|United States|US|Ashburn|Virginia|Desktop|Linux|Unknown|Direct|/
+2026-02-22 18:35:29|34.11.129.23|United States|US|The Dalles|Oregon|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 20:16:52|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 20:17:06|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-22 20:29:16|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:30:44|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:31:04|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:31:13|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:31:15|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:36:41|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:36:51|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:37:24|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:37:29|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:37:47|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:37:51|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:38:09|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 20:39:10|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 20:39:19|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 21:03:24|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 21:05:34|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Linux|Opera|Direct|/
+2026-02-22 21:05:38|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 21:11:59|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 21:12:26|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 21:12:33|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Linux|Opera|Direct|/
+2026-02-22 21:12:44|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Linux|Opera|Direct|/
+2026-02-22 21:12:46|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Linux|Opera|Direct|/
+2026-02-22 21:13:02|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 21:14:59|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-22 21:15:26|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Linux|Chrome|Direct|/
+2026-02-22 21:15:29|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-22 21:21:53|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Linux|Chrome|Direct|/
+2026-02-22 21:51:51|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 21:52:02|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 21:52:21|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 22:02:11|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 22:02:16|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 22:02:29|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Linux|Opera|Direct|/
+2026-02-22 22:02:38|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 22:03:07|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 22:03:42|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 22:03:54|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 22:04:09|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-22 22:05:49|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-22 22:06:17|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-22 22:06:45|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-22 22:06:54|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-22 22:13:15|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-22 22:13:37|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-22 22:14:02|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-22 22:20:03|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-22 22:35:16|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-23 05:19:39|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-23 05:21:01|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-23 06:21:04|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 06:30:44|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 06:31:28|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 06:32:13|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 06:39:09|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 06:39:21|103.20.141.4|Bangladesh|BD|Dhaka|Dhaka Division|Desktop|Windows 10/11|Chrome|https://www.google.com/|/
+2026-02-23 06:48:40|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 06:58:46|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Linux|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-23 06:58:50|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-23 06:59:03|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-23 07:01:36|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-23 07:05:01|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Chrome|android-app://com.google.android.googlequicksearchbox/|/
+2026-02-23 07:52:57|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:01:38|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|https://soundvision.com.bd/ishraq.php|/index.php
+2026-02-23 08:12:47|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:12:57|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:15:31|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:15:52|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:17:50|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:18:01|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:19:30|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:44:38|59.152.5.44|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-23 08:51:01|59.152.5.44|Bangladesh|BD|Dhaka|Dhaka Division|Mobile|Android|Chrome|Direct|/
+2026-02-23 08:51:06|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Mobile|Android|Opera|Direct|/
+2026-02-23 08:54:01|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:56:57|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/
+2026-02-23 08:59:20|103.195.204.116|Bangladesh|BD|Bhātāra|Dhaka Division|Desktop|Windows 10/11|Chrome|Direct|/

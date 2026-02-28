@@ -1,5 +1,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="components/0.nav/navigation.css">
 
 <!-- ══ NAV BAR ══ -->
 <nav class="pnav" id="pnav" role="navigation" aria-label="Main navigation">

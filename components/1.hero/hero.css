@@ -129,7 +129,7 @@
         │  ↓ Change 140px (top) or 52px (bottom) as needed ↓  │
         └─────────────────────────────────────────────────────┘
         */
-        padding:               140px 10px 52px;  /* ← top: navbar clearance | bottom: control bar */
+        padding:               80px 10px 52px;   /* ← top: navbar clearance | bottom: control bar */
         height:                100%;             /* full slide height so image reaches base */
         gap:                   2px;
     }
@@ -524,26 +524,26 @@
     /* 1440px+ */
     @media (min-width:1440px) {
         :root { --img-h: 580px; }
-        .hs-inner { max-width:1400px; padding:0 72px 40px; }
+        .hs-inner { max-width:1400px; padding:80px 72px 52px; }
     }
 
     /* ≤1280px */
     @media (max-width:1280px) {
         :root { --img-h: 480px; }
-        .hs-inner { padding:0 48px 40px; }
+        .hs-inner { padding:80px 48px 52px; }
     }
 
     /* ≤1080px */
     @media (max-width:1080px) {
         :root { --img-h: 440px; }
-        .hs-inner { padding:0 36px 40px; }
+        .hs-inner { padding:80px 36px 52px; }
         .hs-copy { padding-right:24px; }
     }
 
     /* ≤900px — tablet landscape */
     @media (max-width:900px) {
         :root { --img-h: 390px; }
-        .hs-inner { grid-template-columns:54fr 46fr; padding:0 28px 52px; }
+        .hs-inner { grid-template-columns:54fr 46fr; padding:72px 28px 52px; }
         .hs-h1 { font-size: clamp(34px,5.5vw,54px); }
         .hs-scroll { display:none; }
     }
@@ -553,53 +553,51 @@
        first (above) in the stacked layout, guaranteeing the
        person photo is ALWAYS visible on mobile/tablet.       */
     @media (max-width:768px) {
-        :root { --img-h: 300px; }
+        :root { --img-h: 260px; }
 
+        /* Fixed height so slide transitions never shift content below */
         #hero {
-            height:     auto;
-            min-height: 100svh;
+            height:     100svh;
+            min-height: 600px;
         }
 
-        .hs-track { position:relative; height:auto; }
-
-        /* Inactive slides — keep them hidden but let active flow naturally */
-        .hs-slide {
-            position:   absolute;
-            inset:      0;
-            min-height: 100svh;
+        .hs-track {
+            position: absolute;
+            inset:    0;
+            height:   100%;
         }
-        /* Active slide flows normally so page height is correct */
+
+        /* ALL slides stay absolute — document height never changes */
+        .hs-slide,
         .hs-slide.is-active {
-            position: relative;
-            inset:    auto;
+            position: absolute;
+            inset:    0;
         }
 
         .hs-inner {
             grid-template-columns: 1fr;
-            /*
-            ┌──────────────────────────────────────────────────────┐
-            │  MOBILE SPACING — adjust these values manually       │
-            │  padding-top   = how far image drops from top        │
-            │                  increase to push image further down │
-            │  padding-bottom= clears the bottom control bar       │
-            │  ↓ Change 120px (top) or 80px (bottom) as needed ↓   │
-            └──────────────────────────────────────────────────────┘
-            */
-            padding:               120px 20px 80px;  /* ← top: push content below navbar | bottom: control bar */
-            gap:                   0;
-            height:                auto;
-            min-height:            calc(100svh - 70px);
-            align-content:         center;
+            /* Top padding pushes content below navbar (~65px) + breathing room.
+               Bottom padding clears the control bar (~60px).               */
+            padding:        90px 24px 70px;
+            gap:            8px;
+            height:         100%;
+            align-content:  start;   /* stacks image+copy from top, no forced centering */
+            align-items:    center;
+            /* NO overflow:hidden here — chips need to extend outside imgwrap */
+            overflow:       visible;
         }
 
-        /* ★★★ IMAGE ABOVE TEXT ON MOBILE ★★★ */
+        /* ★ IMAGE ABOVE TEXT ★ */
         .hs-visual {
-            order:           -1;        /* moves image above text */
+            order:           -1;
             justify-content: center;
+            align-items:     center;
             height:          auto;
-            padding-bottom:  8px;
+            /* Extra top space so image doesn't kiss the navbar */
+            padding-top:     10px;
+            padding-bottom:  4px;
             opacity:    0;
-            transform:  translateY(-20px);
+            transform:  translateY(-16px);
             transition: opacity .7s var(--slide-ease) .05s,
                         transform .7s var(--slide-ease) .05s;
         }
@@ -607,50 +605,90 @@
             opacity:   1;
             transform: translateY(0);
         }
-        .hs-imgwrap  { max-width:260px; margin:0 auto; }
-        /* Chips: keep inside the imgwrap bounds, scaled down */
-        .hs-chip     { font-size:10px; padding:6px 10px; gap:5px; }
-        .hs-chip-icon{ width:20px; height:20px; font-size:9px; }
-        .hs-chip.top  { top:10%;    right:-4px; }
-        .hs-chip.bot  { bottom:24%; left:-4px;  }
-        .hs-chip.top2 { top:34%;    left:-4px;  }
-        .hs-chip.bot2 { bottom:44%; right:-4px; }
 
-        /* Text copy — centred below image */
-        .hs-copy     { padding-right:0; text-align:center; transform:translateY(24px); }
-        .hs-pill     { justify-content:center; margin:12px auto 16px; }
-        .hs-h1       { font-size:clamp(32px,8vw,50px); letter-spacing:-1px; }
-        .hs-body     { margin:0 auto 28px; font-size:14.5px; max-width:90%; }
-        .hs-cta      { justify-content:center; margin-bottom:28px; }
-        .hs-stats    { justify-content:center; }
-        .hs-scroll   { display:none; }
-        .hs-nav      { padding:12px 20px; }
+        /* imgwrap: give horizontal room so chips aren't clipped */
+        .hs-imgwrap {
+            max-width:  200px;
+            margin:     0 auto;
+            /* Wider padding so chips on either side have room */
+            padding:    0 72px;
+            box-sizing: content-box; /* padding adds to width, not inside it */
+        }
+
+        /* Chip base — compact */
+        .hs-chip      { font-size:9.5px; padding:5px 10px; gap:5px; white-space:nowrap; }
+        .hs-chip-icon { width:18px; height:18px; font-size:8px; }
+
+        /* Chips: positioned relative to .hs-imgwrap (including its padding).
+           Negative values pull them into the padding zone, never over the photo. */
+        .hs-chip.top  { top:8%;     right:2px;  }   /* upper-right */
+        .hs-chip.bot2 { bottom:35%; right:2px;  }   /* lower-right */
+        .hs-chip.top2 { top:32%;    left:2px;   }   /* mid-left    */
+        .hs-chip.bot  { bottom:16%; left:2px;   }   /* lower-left  */
+
+        /* Text copy */
+        .hs-copy {
+            padding-right: 0;
+            text-align:    center;
+            transform:     translateY(0); /* no extra shift — align-content handles spacing */
+        }
+        .hs-pill    { justify-content:center; margin:8px auto 12px; }
+        .hs-h1      { font-size:clamp(26px,6.5vw,38px); letter-spacing:-.8px; margin-bottom:10px; }
+        .hs-body    { margin:0 auto 14px; font-size:13.5px; max-width:88%; line-height:1.6; }
+
+        /* ★ BUTTONS: smaller on mobile ★ */
+        .hs-cta     { justify-content:center; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+        .hs-btn     { padding:10px 20px; font-size:13px; border-radius:11px; }
+
+        .hs-stats   { justify-content:center; }
+        .hs-stat    { padding:0 12px; }
+        .hs-stat strong { font-size:20px; }
+        .hs-stat span   { font-size:10px; }
+        .hs-stat-sep    { height:28px; }
+
+        .hs-scroll  { display:none; }
+        .hs-nav     { padding:8px 20px; }
     }
 
     /* ≤520px */
     @media (max-width:520px) {
-        :root { --img-h: 260px; }
-        .hs-imgwrap  { max-width:220px; }
-        .hs-h1       { font-size:clamp(28px,9vw,44px); }
-        .hs-stat     { padding:0 14px; }
-        .hs-stat strong { font-size:22px; }
-        .hs-chip     { font-size:9.5px; padding:5px 9px; }
+        :root { --img-h: 240px; }
+        .hs-imgwrap   { max-width:180px; padding:0 68px; box-sizing:content-box; }
+        .hs-h1        { font-size:clamp(24px,7vw,36px); }
+        .hs-body      { font-size:13px; }
+        .hs-btn       { padding:9px 18px; font-size:12.5px; }
+        .hs-stat      { padding:0 12px; }
+        .hs-stat strong { font-size:18px; }
+        .hs-chip      { font-size:9px; padding:4px 9px; }
+        .hs-chip.top  { top:8%;     right:2px;  }
+        .hs-chip.bot2 { bottom:33%; right:2px;  }
+        .hs-chip.top2 { top:30%;    left:2px;   }
+        .hs-chip.bot  { bottom:14%; left:2px;   }
     }
 
     /* ≤420px — small phones */
     @media (max-width:420px) {
-        :root { --img-h: 220px; }
-        .hs-imgwrap  { max-width:185px; }
-        /* Chips: scaled to minimum, stay visible */
-        .hs-chip     { font-size:9px; padding:4px 8px; gap:4px; }
-        .hs-chip-icon{ width:18px; height:18px; font-size:8px; }
-        .hs-cta      { flex-direction:column; align-items:center; }
-        .hs-btn      { width:100%; max-width:260px; justify-content:center; }
-        .hs-stat     { padding:0 10px; }
-        .hs-stat strong { font-size:20px; }
-        .hs-nav      { padding:10px 14px; gap:12px; }
-        .hs-arrow    { width:34px; height:34px; font-size:12px; }
-        .hs-dot      { width:7px; height:7px; }
+        :root { --img-h: 210px; }
+        #hero         { min-height: 560px; }
+        .hs-inner     { padding:80px 20px 65px; }
+        .hs-imgwrap   { max-width:165px; padding:0 62px; box-sizing:content-box; }
+        .hs-chip      { font-size:8.5px; padding:4px 8px; gap:4px; }
+        .hs-chip-icon { width:16px; height:16px; font-size:7.5px; }
+        .hs-chip.top  { top:8%;     right:2px;  }
+        .hs-chip.bot2 { bottom:32%; right:2px;  }
+        .hs-chip.top2 { top:30%;    left:2px;   }
+        .hs-chip.bot  { bottom:13%; left:2px;   }
+        .hs-h1        { font-size:clamp(22px,7vw,32px); }
+        .hs-body      { font-size:12.5px; margin-bottom:10px; }
+        .hs-cta       { gap:8px; margin-bottom:10px; }
+        .hs-btn       { padding:9px 16px; font-size:12px; border-radius:10px; }
+        .hs-stat      { padding:0 8px; }
+        .hs-stat strong { font-size:17px; }
+        .hs-stat span   { font-size:9px; }
+        .hs-stat-sep    { height:24px; }
+        .hs-nav       { padding:8px 14px; gap:12px; }
+        .hs-arrow     { width:34px; height:34px; font-size:12px; }
+        .hs-dot       { width:7px; height:7px; }
         .hs-dot.active { width:22px; }
     }
 

@@ -1,0 +1,118 @@
+/* ============================================================
+   overflow-fix.css  —  Sound Vision mobile overflow fix
+   Targets the exact 3 elements identified via console:
+     1. .sv-thumbnail-carousel  (1160px)
+     2. .sv-thumbnails-track    (1160px)
+     3. .sv-tm-bg-glow--a       (900px)
+   Plus global safety net for html/body.
+   Link this as the FIRST stylesheet in <head>.
+   ============================================================ */
+
+/* ── ROOT: prevent html/body from ever scrolling sideways ── */
+html,
+body {
+    overflow-x: hidden;
+    max-width:  100%;
+}
+
+/* body needs position:relative for overflow-x:hidden to fully work
+   on some Android WebKit/Chrome builds */
+body {
+    position: relative;
+}
+
+/* ══════════════════════════════════════════════════════════
+   FIX 1 & 2 — Thumbnail carousel (was 1160px on mobile)
+   
+   The track is a flex row of fixed-width thumbnails.
+   On mobile the total width exceeds the viewport.
+   Solution: clip the outer wrapper, let track scroll
+   internally only (not the page).
+══════════════════════════════════════════════════════════ */
+.sv-thumbnail-carousel {
+    max-width:  100%;
+    width:      100%;
+    overflow-x: hidden;   /* hard clip — nothing escapes */
+    box-sizing: border-box;
+}
+
+.sv-thumbnails-track {
+    max-width:  none;     /* track itself can be wide… */
+    overflow-x: auto;     /* …but scrolls INSIDE the clipped wrapper */
+    -webkit-overflow-scrolling: touch; /* smooth momentum scroll on iOS */
+    scrollbar-width: none;  /* hide scrollbar — clean look */
+}
+.sv-thumbnails-track::-webkit-scrollbar { display: none; }
+
+/* ══════════════════════════════════════════════════════════
+   FIX 3 — Background glow blob (was 900px on mobile)
+   
+   The glow divs use large fixed pixel widths (800-900px)
+   and are positioned absolutely. They need to be clipped
+   by their parent, not allowed to expand the page width.
+   The parent (.sv-tm-bg) already has overflow:hidden in
+   team.css but may not be enforcing it on mobile.
+══════════════════════════════════════════════════════════ */
+.sv-tm-bg,
+.sv-awards-bg,
+.sv-aw-bg,
+[class*="-bg"]:not(body):not(html) {
+    overflow: hidden;      /* clips ALL child glow blobs */
+    max-width: 100%;
+}
+
+/* The glow blobs themselves — constrain so they don't
+   push layout even if parent clip somehow fails */
+.sv-tm-bg-glow,
+.sv-tm-bg-glow--a,
+.sv-tm-bg-glow--b,
+.sv-awards-bg-glow,
+.sv-awards-bg-glow--left,
+.sv-awards-bg-glow--right,
+.sv-aw-glow,
+.sv-aw-glow--a,
+.sv-aw-glow--b,
+[class*="-glow"] {
+    /* Glows are decorative — never let them affect page width */
+    pointer-events: none;
+    max-width:  none;   /* allow internal large size for blur effect */
+    /* The key: they must be absolutely positioned so they
+       don't participate in document flow */
+    position:   absolute;
+}
+
+/* ══════════════════════════════════════════════════════════
+   GLOBAL SAFETY NET
+   Catches any other element that might overflow
+══════════════════════════════════════════════════════════ */
+
+/* Sections and layout blocks — never wider than viewport */
+section,
+header,
+footer,
+main,
+nav,
+.section,
+[class*="section"],
+[class*="container"],
+[class*="wrapper"] {
+    max-width:  100%;
+    box-sizing: border-box;
+}
+
+/* Images/media — never overflow their container */
+img, video, iframe, svg, embed, object {
+    max-width: 100%;
+}
+
+/* Fixed/absolute positioned elements — keep left edge on-screen */
+/* (don't touch right: because glows use negative right values intentionally) */
+
+/* Any element using 100vw should use 100% instead on mobile.
+   This corrects the most common cause of 1-15px right gaps. */
+@media (max-width: 768px) {
+    [style*="width: 100vw"],
+    [style*="width:100vw"] {
+        width: 100% !important;
+    }
+}

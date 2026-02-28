@@ -1,0 +1,9 @@
+# ── cPanel Deployment Config ──
+---
+deployment:
+  tasks:
+    - export: 1
+      after:
+        - chmod -R 755 .
+        - echo "Deployment finished!"
+        - echo "Ensure index.php is default page"

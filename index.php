@@ -40,6 +40,7 @@ define('BASE_PATH', __DIR__);
     <link rel="stylesheet" href="components/11.visitor/visitor_counter.css">
     <link rel="stylesheet" href="components/12.footer/footer.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/overflow-fix.css">
     
     
 

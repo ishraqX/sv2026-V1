@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="components/12.footer/footer.css">
 <footer class="footer">
     <div class="footer-main">
         <div class="container">

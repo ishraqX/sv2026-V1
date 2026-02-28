@@ -37,6 +37,7 @@ file_put_contents($counter_file, $current_count);
     <link rel="stylesheet" href="assets/css/visitor-counter.css">
     <link rel="stylesheet" href="assets/css/footer.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/overflow-fix.css">
 </head>
 <body>
     <!-- Navigation -->
