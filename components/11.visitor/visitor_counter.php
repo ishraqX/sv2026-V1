@@ -229,7 +229,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
         <!-- Dashboard button: only visible to localhost/admin -->
         <?php if ($sv_showDash): ?>
         <div class="sv-ribbon-right">
-            <a href="components/visitor/dashboard.php" target="_blank" class="sv-dash-btn">
+            <a href="components/11.visitor/dashboard.php" target="_blank" class="sv-dash-btn">
                 📊 <span class="sv-dash-txt">Dashboard</span>
             </a>
         </div>
@@ -238,4 +238,4 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
     </div>
 </div>
 
-<script src="components/visitor/visitor_counter.js"></script>
+<script src="components/11.visitor/visitor_counter.js"></script>
