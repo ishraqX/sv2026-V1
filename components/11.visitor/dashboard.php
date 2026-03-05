@@ -1,8 +1,8 @@
 <?php
 // ============================================================
-// dashboard.php — Sound Vision Analytics Dashboard
-// FIXES: Charts data injection, full IP display, IP visit counts,
-//        hacker-style world map, professional visitors log
+// dashboard.php — Sound Vision Security Analytics Dashboard
+// ENHANCED WITH: Threat scoring, Bot detection, Heatmap,
+//                Referer analysis, Session timeline, Export logs
 // ============================================================
 
 define('SV_DASH_PASS', 'soundvision2024');
@@ -25,6 +25,102 @@ if (!empty($_SESSION['sv_admin_exp']) && time() > $_SESSION['sv_admin_exp']) {
 if (isset($_GET['logout'])) {
     unset($_SESSION['sv_admin'], $_SESSION['sv_admin_exp']);
     header('Location: dashboard.php'); exit;
+}
+
+// Handle export request
+if (isset($_GET['export']) && in_array($_GET['export'], ['csv', 'json'])) {
+    if (empty($_SESSION['sv_admin']) && !in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1','::1'], true)) {
+        die('Unauthorized');
+    }
+    
+    $userDataFile  = __DIR__ . '/data/user-data.txt';
+    if (!file_exists($userDataFile)) die('No data available');
+    
+    $lines = file($userDataFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+    $rows  = [];
+    foreach ($lines as $l) {
+        $p = explode('|', $l);
+        if (count($p) >= 11) {
+            $rows[] = [
+                'datetime'    => $p[0],
+                'ip'          => $p[1],
+                'country'     => $p[2],
+                'countryCode' => $p[3],
+                'city'        => $p[4],
+                'region'      => $p[5],
+                'device'      => $p[6],
+                'os'          => $p[7],
+                'browser'     => $p[8],
+                'referer'     => $p[9],
+                'page'        => $p[10],
+            ];
+        }
+    }
+    
+    if ($_GET['export'] === 'csv') {
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="visitor_log_' . date('Y-m-d_His') . '.csv"');
+        echo "DateTime,IP,Country,City,Device,OS,Browser,Referer,Page\n";
+        foreach ($rows as $r) {
+            echo sprintf('"%s","%s","%s","%s","%s","%s","%s","%s","%s"' . "\n",
+                $r['datetime'], $r['ip'], $r['country'], $r['city'],
+                $r['device'], $r['os'], $r['browser'], $r['referer'], $r['page']
+            );
+        }
+    } else {
+        header('Content-Type: application/json; charset=utf-8');
+        header('Content-Disposition: attachment; filename="visitor_log_' . date('Y-m-d_His') . '.json"');
+        echo json_encode($rows, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    }
+    exit;
+}
+
+// ── Security Analysis Functions ──────────────────────────
+function sv_is_bot_ua(string $ua): bool {
+    $botPatterns = [
+        'bot', 'crawler', 'spider', 'scraper', 'curl', 'wget',
+        'python', 'java(?!script)', 'perl', 'ruby', 'php', 'node',
+        'go-http-client', 'slurp', 'bingbot', 'googlebot', 'yandex'
+    ];
+    foreach ($botPatterns as $p) {
+        if (preg_match("/$p/i", $ua)) return true;
+    }
+    return false;
+}
+
+function sv_calculate_threat_score(array $ipData, array $allRows): int {
+    $score = 0;
+    $count = $ipData['count'] ?? 1;
+    
+    // High visit frequency
+    if ($count >= 20) $score += 30;
+    elseif ($count >= 10) $score += 15;
+    elseif ($count >= 5) $score += 5;
+    
+    // Check for bot User Agent (from visitor data)
+    if (isset($ipData['isBot']) && $ipData['isBot']) $score += 25;
+    
+    // Check for suspicious referer patterns
+    if (isset($ipData['referer'])) {
+        if (preg_match('/^(https?:|)\/\//i', $ipData['referer'])) $score += 10; // Bad referer
+    }
+    
+    // Check for repeated requests in short time (scan-like behavior)
+    if (isset($ipData['requests_per_hour']) && $ipData['requests_per_hour'] > 50) $score += 20;
+    
+    // Filter country check
+    $suspicious_countries = ['xx', 'unknown'];
+    if (in_array(strtolower($ipData['countryCode'] ?? 'xx'), $suspicious_countries)) $score += 10;
+    
+    return min($score, 100);
+}
+
+function sv_categorize_threat(int $score): array {
+    if ($score >= 70) return ['level' => 'CRITICAL', 'color' => '#ef4444', 'icon' => '⚠️'];
+    if ($score >= 50) return ['level' => 'HIGH', 'color' => '#f97316', 'icon' => '⚡'];
+    if ($score >= 30) return ['level' => 'MEDIUM', 'color' => '#eab308', 'icon' => '⚔️'];
+    if ($score >= 15) return ['level' => 'LOW', 'color' => '#3b82f6', 'icon' => '🔍'];
+    return ['level' => 'SAFE', 'color' => '#22c55e', 'icon' => '✓'];
 }
 
 $sv_is_local = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1','::1'], true);
@@ -113,6 +209,90 @@ if (file_exists($userDataFile)) {
 
 $totalUnique = count($rows);
 
+// ── Security Analysis: Threat Scoring & Bot Detection ──
+$ipThreats = []; // IP => [score, level, isBot, threats[]]
+$hourlyTraffic = []; // Hour => count
+$refererData = []; // Referer => count
+$threatAlerts = []; // Array of high-threat IPs
+$sessionTimeline = []; // IP => [timestamps]
+$userAgents = []; // UA => count
+
+foreach ($rows as $r) {
+    // Extract hour from datetime
+    $dt = $r['datetime'];
+    $hour = date('H', strtotime($dt));
+    $hourlyTraffic[$hour] = ($hourlyTraffic[$hour] ?? 0) + 1;
+    
+    // Referer analysis
+    $ref = $r['referer'] ?: 'Direct';
+    $refererData[$ref] = ($refererData[$ref] ?? 0) + 1;
+    
+    // Session timeline per IP
+    $ip = $r['ip'];
+    if (!isset($sessionTimeline[$ip])) $sessionTimeline[$ip] = [];
+    $sessionTimeline[$ip][] = $dt;
+    
+    // User Agent stats
+    $ua = $r['browser'] . ' / ' . $r['os'];
+    $userAgents[$ua] = ($userAgents[$ua] ?? 0) + 1;
+}
+
+// Calculate threat scores for each IP
+foreach ($ipCounts as $ip => $info) {
+    $isBot = false;
+    $botCount = 0;
+    
+    // Check if this IP made bot requests
+    foreach ($rows as $r) {
+        if ($r['ip'] === $ip && sv_is_bot_ua($r['browser'] ?? '')) {
+            $isBot = true;
+            $botCount++;
+        }
+    }
+    
+    $ipCounts[$ip]['isBot'] = $isBot;
+    $ipCounts[$ip]['requests_per_hour'] = $info['count'] > 0 ? ceil($info['count'] / 24) : 0;
+    
+    $threatScore = sv_calculate_threat_score($ipCounts[$ip], $rows);
+    $threatLevel = sv_categorize_threat($threatScore);
+    
+    $ipThreats[$ip] = [
+        'score' => $threatScore,
+        'level' => $threatLevel['level'],
+        'color' => $threatLevel['color'],
+        'icon' => $threatLevel['icon'],
+        'isBot' => $isBot,
+        'visits' => $info['count']
+    ];
+    
+    if ($threatScore >= 30) {
+        $threatAlerts[] = [
+            'ip' => $ip,
+            'score' => $threatScore,
+            'level' => $threatLevel['level'],
+            'color' => $threatLevel['color'],
+            'icon' => $threatLevel['icon'],
+            'country' => $info['country'],
+            'visits' => $info['count'],
+            'isBot' => $isBot
+        ];
+    }
+}
+
+// Sort threat alerts by score descending
+usort($threatAlerts, fn($a, $b) => $b['score'] <=> $a['score']);
+$threatAlerts = array_slice($threatAlerts, 0, 20); // Top 20 threats
+
+// Pad hourly traffic to 24 hours
+for ($h = 0; $h < 24; $h++) {
+    if (!isset($hourlyTraffic[$h])) $hourlyTraffic[$h] = 0;
+}
+ksort($hourlyTraffic);
+
+// Top referers
+arsort($refererData);
+$topReferers = array_slice($refererData, 0, 10);
+
 // Aggregate stats
 $countries = []; $devices = []; $browsers = []; $os_list = []; $daily = [];
 $ipCounts  = []; // IP visit frequency
@@ -175,6 +355,9 @@ $last30Json = json_encode($last30,   JSON_UNESCAPED_UNICODE);
 $devJson    = json_encode($devices,  JSON_UNESCAPED_UNICODE);
 $browJson   = json_encode($browsers, JSON_UNESCAPED_UNICODE);
 $osJson     = json_encode($os_list,  JSON_UNESCAPED_UNICODE);
+$hourlyJson = json_encode(array_values($hourlyTraffic), JSON_UNESCAPED_UNICODE);
+$ipThreatsJson = json_encode($ipThreats, JSON_UNESCAPED_UNICODE);
+$threatAlertsJson = json_encode($threatAlerts, JSON_UNESCAPED_UNICODE);
 
 // Country data with codes for map
 $countryMapData = [];
@@ -384,19 +567,28 @@ function flag(string $cc): string {
     </div>
 
     <nav class="db-nav">
-        <a href="#overview"  class="db-nav-item active" data-section="overview">
+        <a href="#overview"    class="db-nav-item active" data-section="overview">
             <i class="fas fa-gauge-high"></i><span>Overview</span>
         </a>
-        <a href="#countries" class="db-nav-item" data-section="countries">
+        <a href="#security"    class="db-nav-item" data-section="security">
+            <i class="fas fa-shield-alt"></i><span>Security Threats</span>
+        </a>
+        <a href="#heatmap"     class="db-nav-item" data-section="heatmap">
+            <i class="fas fa-fire"></i><span>Traffic Heatmap</span>
+        </a>
+        <a href="#referers"    class="db-nav-item" data-section="referers">
+            <i class="fas fa-link"></i><span>Referer Analysis</span>
+        </a>
+        <a href="#countries"   class="db-nav-item" data-section="countries">
             <i class="fas fa-earth-asia"></i><span>Countries + Map</span>
         </a>
-        <a href="#devices"   class="db-nav-item" data-section="devices">
+        <a href="#devices"     class="db-nav-item" data-section="devices">
             <i class="fas fa-mobile-screen-button"></i><span>Devices</span>
         </a>
-        <a href="#visitors"  class="db-nav-item" data-section="visitors">
+        <a href="#visitors"    class="db-nav-item" data-section="visitors">
             <i class="fas fa-users"></i><span>Visitors Log</span>
         </a>
-        <a href="#iptracker" class="db-nav-item" data-section="iptracker">
+        <a href="#iptracker"   class="db-nav-item" data-section="iptracker">
             <i class="fas fa-network-wired"></i><span>IP Tracker</span>
         </a>
     </nav>
@@ -417,6 +609,10 @@ function flag(string $cc): string {
             <p class="db-page-date">Last updated: <?= date('D, d M Y · H:i') ?></p>
         </div>
         <div class="db-topbar-right">
+            <div style="display:flex;gap:8px">
+                <a href="dashboard.php?export=csv" class="db-back-btn" title="Export as CSV"><i class="fas fa-download"></i> CSV</a>
+                <a href="dashboard.php?export=json" class="db-back-btn" title="Export as JSON"><i class="fas fa-download"></i> JSON</a>
+            </div>
             <a href="../../index.php" class="db-back-btn"><i class="fas fa-arrow-left"></i> Back to Site</a>
             <?php if (!$sv_is_local): ?>
             <a href="dashboard.php?logout=1" class="db-back-btn" style="color:#fca5a5;border-color:rgba(239,68,68,0.3);margin-left:8px"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -518,8 +714,237 @@ function flag(string $cc): string {
     </section>
 
     <!-- ══════════════════════════════════════════════ -->
-    <!-- SECTION: Countries + Hacker Map               -->
+    <!-- SECTION: Security Threats & Alerts            -->
     <!-- ══════════════════════════════════════════════ -->
+    <section class="db-section db-section--hidden" id="security">
+        <div class="db-section-header">
+            <h2><i class="fas fa-shield-alt" style="color:#ef4444;margin-right:8px"></i>Security Analysis &amp; Threat Alerts</h2>
+            <span class="db-stat-pill"><?= count($threatAlerts) ?> threats detected · <?= count($ipThreats) ?> IPs analyzed</span>
+        </div>
+
+        <!-- Threat Summary Stats -->
+        <div class="db-kpi-grid" style="margin-bottom:20px">
+            <?php 
+            $critical = count(array_filter($threatAlerts, fn($t) => $t['level'] === 'CRITICAL'));
+            $high = count(array_filter($threatAlerts, fn($t) => $t['level'] === 'HIGH'));
+            $medium = count(array_filter($threatAlerts, fn($t) => $t['level'] === 'MEDIUM'));
+            ?>
+            <div class="db-kpi db-kpi--red">
+                <div class="db-kpi-icon"><i class="fas fa-fire"></i></div>
+                <div class="db-kpi-body">
+                    <div class="db-kpi-num"><?= $critical ?></div>
+                    <div class="db-kpi-label">Critical Threats</div>
+                </div>
+                <div class="db-kpi-bg-icon"><i class="fas fa-fire"></i></div>
+            </div>
+            <div class="db-kpi db-kpi--orange">
+                <div class="db-kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="db-kpi-body">
+                    <div class="db-kpi-num"><?= $high ?></div>
+                    <div class="db-kpi-label">High Risk IPs</div>
+                </div>
+                <div class="db-kpi-bg-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            </div>
+            <div class="db-kpi db-kpi--yellow">
+                <div class="db-kpi-icon"><i class="fas fa-flag"></i></div>
+                <div class="db-kpi-body">
+                    <div class="db-kpi-num"><?= $medium ?></div>
+                    <div class="db-kpi-label">Medium Risk</div>
+                </div>
+                <div class="db-kpi-bg-icon"><i class="fas fa-flag"></i></div>
+            </div>
+            <div class="db-kpi db-kpi--green">
+                <div class="db-kpi-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="db-kpi-body">
+                    <div class="db-kpi-num"><?= count($ipThreats) - count($threatAlerts) ?></div>
+                    <div class="db-kpi-label">Benign IPs</div>
+                </div>
+                <div class="db-kpi-bg-icon"><i class="fas fa-check-circle"></i></div>
+            </div>
+        </div>
+
+        <!-- Threat Alerts Panel -->
+        <div class="db-card">
+            <div class="db-card-header">
+                <h3><i class="fas fa-exclamation-circle"></i> Security Alerts</h3>
+                <span class="db-badge"><?= count($threatAlerts) ?> flagged IPs</span>
+            </div>
+            <?php if (empty($threatAlerts)): ?>
+            <div style="padding:40px;text-align:center;color:#22c55e">
+                <i class="fas fa-check-double" style="font-size:32px;margin-bottom:12px;display:block"></i>
+                <strong>All Clear!</strong> No suspicious activity detected.
+            </div>
+            <?php else: ?>
+            <div class="db-table-wrap">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>Threat Level</th>
+                            <th>IP Address</th>
+                            <th>Score</th>
+                            <th>Visits</th>
+                            <th>Country</th>
+                            <th>Bot?</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($threatAlerts as $alert): ?>
+                        <tr style="border-left: 4px solid <?= $alert['color'] ?>">
+                            <td>
+                                <span class="threat-badge" style="background: <?= $alert['color'] ?>20; color: <?= $alert['color'] ?>; border: 1px solid <?= $alert['color'] ?>40">
+                                    <?= $alert['icon'] ?> <?= $alert['level'] ?>
+                                </span>
+                            </td>
+                            <td class="db-ip-cell"><?= htmlspecialchars($alert['ip']) ?></td>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:8px">
+                                    <span style="font-weight:700;color:#e2e8f0"><?= $alert['score'] ?></span>
+                                    <div style="width:60px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden">
+                                        <div style="width:<?= $alert['score'] ?>%;height:100%;background:<?= $alert['color'] ?>;transition:width 0.3s"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="db-num"><strong><?= $alert['visits'] ?></strong></td>
+                            <td><?= flag($countries[array_search($alert['country'], array_column($rows, 'country'))][0] ?? 'XX') ?? '🌐' ?> <?= htmlspecialchars($alert['country']) ?></td>
+                            <td><?= $alert['isBot'] ? '<span style="color:#f97316">🤖 Bot</span>' : '<span style="color:#22c55e">Human</span>' ?></td>
+                            <td><button class="db-btn-small" onclick="alert('IP: ' + '<?= addslashes($alert['ip']) ?>' + '\\nVisits: ' + '<?= $alert['visits'] ?>' + '\\nThreat Score: ' + '<?= $alert['score'] ?>')">Review</button></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Threat Score Distribution Chart -->
+        <div class="db-charts-row">
+            <div class="db-chart-card db-chart-card--wide">
+                <div class="db-chart-header">
+                    <h3><i class="fas fa-chart-bar"></i> Threat Score Distribution</h3>
+                </div>
+                <div class="db-chart-body" style="height:240px">
+                    <canvas id="chartThreatDist"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- SECTION: Hourly Traffic Heatmap              -->
+    <!-- ══════════════════════════════════════════════ -->
+    <section class="db-section db-section--hidden" id="heatmap">
+        <div class="db-section-header">
+            <h2><i class="fas fa-fire" style="color:#f97316;margin-right:8px"></i>Hourly Traffic Heatmap</h2>
+            <span class="db-stat-pill">24-hour distribution</span>
+        </div>
+
+        <div class="db-card">
+            <div class="db-card-header">
+                <h3><i class="fas fa-clock"></i> Traffic by Hour (UTC)</h3>
+            </div>
+            <div style="padding:20px">
+                <div class="heatmap-container">
+                    <?php for ($h = 0; $h < 24; $h++): 
+                        $val = $hourlyTraffic[$h] ?? 0;
+                        $maxH = max($hourlyTraffic) ?: 1;
+                        $pct = ($val / $maxH) * 100;
+                        $opacity = max(0.2, $pct / 100);
+                    ?>
+                    <div class="heatmap-cell" style="--val: <?= $pct ?>%; --opacity: <?= $opacity ?>" title="<?= sprintf('%02d:00 - %02d submissions', $h, (int)$val) ?>">
+                        <div class="heatmap-label"><?= sprintf('%02d', $h) ?></div>
+                        <div class="heatmap-value"><?= $val ?></div>
+                    </div>
+                    <?php endfor; ?>
+                </div>
+                <div style="margin-top:20px;display:flex;justify-content:space-between;font-size:11px;color:#64748b">
+                    <span>Peak: <strong style="color:#f97316"><?= max($hourlyTraffic) ?? 0 ?></strong> visits</span>
+                    <span>Average: <strong style="color:#3b82f6"><?= ceil(array_sum($hourlyTraffic) / 24) ?></strong> visits/hour</span>
+                    <span>Total: <strong style="color:#22c55e"><?= array_sum($hourlyTraffic) ?></strong> visits</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Heatmap Chart -->
+        <div class="db-charts-row">
+            <div class="db-chart-card db-chart-card--wide">
+                <div class="db-chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Hourly Traffic Chart</h3>
+                </div>
+                <div class="db-chart-body" style="height:280px">
+                    <canvas id="chartHourly"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- SECTION: Referer Analysis                     -->
+    <!-- ══════════════════════════════════════════════ -->
+    <section class="db-section db-section--hidden" id="referers">
+        <div class="db-section-header">
+            <h2><i class="fas fa-link" style="color:#3b82f6;margin-right:8px"></i>Referer Analysis</h2>
+            <span class="db-stat-pill"><?= count($refererData) ?> unique sources</span>
+        </div>
+
+        <div class="db-charts-row">
+            <div class="db-chart-card db-chart-card--wide">
+                <div class="db-chart-header">
+                    <h3><i class="fas fa-chart-pie"></i> Traffic by Referer</h3>
+                </div>
+                <div class="db-chart-body" style="height:300px">
+                    <canvas id="chartReferer"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Referer Table -->
+        <div class="db-card">
+            <div class="db-card-header">
+                <h3><i class="fas fa-list"></i> Referer Sources</h3>
+                <span class="db-badge"><?= count($refererData) ?> sources</span>
+            </div>
+            <div class="db-table-wrap">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Referer Source</th>
+                            <th>Visits</th>
+                            <th>% of Total</th>
+                            <th>Distribution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $rank = 1; $maxRef = max(array_values($refererData) ?: [1]);
+                        $sortedRef = $refererData;
+                        arsort($sortedRef);
+                        foreach ($sortedRef as $ref => $count): ?>
+                        <tr>
+                            <td class="db-rank"><?= $rank++ ?></td>
+                            <td style="max-width:300px;overflow:auto;font-size:12px;font-family:'Space Mono',monospace">
+                                <?php if ($ref === 'Direct'): ?>
+                                    <span style="color:#22c55e"><i class="fas fa-arrow-right"></i> Direct Traffic</span>
+                                <?php else: ?>
+                                    <a href="<?= htmlspecialchars($ref) ?>" target="_blank" style="color:#3b82f6;text-decoration:none" title="<?= htmlspecialchars($ref) ?>">
+                                        <?= htmlspecialchars(strlen($ref) > 50 ? substr($ref, 0, 47) . '...' : $ref) ?>
+                                    </a>
+                                <?php endif; ?>
+                            </td>
+                            <td class="db-num"><?= number_format($count) ?></td>
+                            <td class="db-num"><?= $totalUnique > 0 ? round($count/$totalUnique*100, 1) : 0 ?>%</td>
+                            <td style="min-width:120px">
+                                <div class="db-progress">
+                                    <div class="db-progress-bar db-progress-bar--blue" style="width:<?= $maxRef > 0 ? round($count/$maxRef*100) : 0 ?>%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
     <section class="db-section db-section--hidden" id="countries">
 
         <div class="db-section-header">
@@ -725,13 +1150,70 @@ function flag(string $cc): string {
     <!-- ══════════════════════════════════════════════ -->
     <section class="db-section db-section--hidden" id="iptracker">
         <div class="db-section-header">
-            <h2><i class="fas fa-network-wired" style="color:#3b82f6;margin-right:8px"></i>IP Frequency Tracker</h2>
-            <span class="db-stat-pill"><?= count($ipCounts) ?> unique IPs tracked</span>
+            <h2><i class="fas fa-network-wired" style="color:#3b82f6;margin-right:8px"></i>IP Tracker &amp; Session Analysis</h2>
+            <span class="db-stat-pill"><?= count($ipCounts) ?> unique IPs · <?= count(array_filter($ipThreats, fn($t) => $t['score'] >= 30)) ?> flagged</span>
         </div>
 
+        <!-- IP Threat Analysis -->
+        <div class="db-card" style="margin-bottom:20px">
+            <div class="db-card-header">
+                <h3><i class="fas fa-fingerprint"></i> Top IPs by Threat Score</h3>
+                <span class="db-badge"><?= count($ipThreats) ?> IPs analyzed</span>
+            </div>
+            <div class="db-table-wrap">
+                <table class="db-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>IP Address</th>
+                            <th>Threat Score</th>
+                            <th>Level</th>
+                            <th>Visits</th>
+                            <th>Bot?</th>
+                            <th>Country</th>
+                            <th>Last Seen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php $rank = 1; 
+                        $sortedThreats = array_slice(
+                            array_filter($ipThreats, fn($t) => $t['score'] >= 15),
+                            0, 30
+                        );
+                        usort($sortedThreats, fn($a, $b) => strcmp(key($sortedThreats), key($sortedThreats)));
+                        
+                        foreach ($ipThreats as $ip => $threat):
+                            if ($threat['score'] < 15) continue;
+                        ?>
+                        <tr style="border-left: 3px solid <?= $threat['color'] ?>">
+                            <td class="db-rank"><?= $rank++ ?></td>
+                            <td class="db-ip-cell"><?= htmlspecialchars($ip) ?></td>
+                            <td>
+                                <span style="font-weight:700;color:<?= $threat['color'] ?>"><?= $threat['score'] ?>/100</span>
+                            </td>
+                            <td>
+                                <span class="threat-badge" style="background: <?= $threat['color'] ?>20; color: <?= $threat['color'] ?>; border: 1px solid <?= $threat['color'] ?>40">
+                                    <?= $threat['icon'] ?> <?= $threat['level'] ?>
+                                </span>
+                            </td>
+                            <td class="db-num"><strong><?= $threat['visits'] ?></strong></td>
+                            <td><?= $threat['isBot'] ? '<span style="color:#f97316">🤖</span>' : '<span style="color:#22c55e">✓</span>' ?></td>
+                            <td><?= htmlspecialchars($ipCounts[$ip]['country'] ?? 'Unknown') ?></td>
+                            <td class="db-mono" style="font-size:11px;color:#64748b"><?= htmlspecialchars($ipCounts[$ip]['last'] ?? 'N/A') ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($ipThreats)): ?>
+                        <tr><td colspan="8" style="text-align:center;padding:40px;color:#64748b">All IPs appear benign.</td></tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top IPs by Visit Count -->
         <div class="db-card">
             <div class="db-card-header">
-                <h3><i class="fas fa-fingerprint"></i> Top IPs by Visit Count</h3>
+                <h3><i class="fas fa-crown"></i> Top IPs by Visit Frequency</h3>
                 <span class="db-badge"><?= count($topIPs) ?> IPs</span>
             </div>
             <div class="db-table-wrap">
@@ -746,6 +1228,7 @@ function flag(string $cc): string {
                             <th>City</th>
                             <th>Device</th>
                             <th>Browser</th>
+                            <th>Threat Level</th>
                             <th>Last Seen</th>
                         </tr>
                     </thead>
@@ -756,6 +1239,8 @@ function flag(string $cc): string {
                             if ($cnt >= 10) $badgeClass = 'ip-badge-high';
                             elseif ($cnt >= 3) $badgeClass = 'ip-badge-med';
                             else $badgeClass = 'ip-badge-low';
+                            
+                            $threatLvl = $ipThreats[$ip] ?? ['level' => 'UNKNOWN', 'color' => '#64748b', 'icon' => '?'];
                         ?>
                         <tr>
                             <td class="db-rank"><?= $ipRank++ ?></td>
@@ -770,11 +1255,14 @@ function flag(string $cc): string {
                             <td style="color:#94a3b8;font-size:12px"><?= htmlspecialchars($info['city']) ?></td>
                             <td><span class="db-tag db-tag--<?= strtolower($info['device']) ?>"><?= htmlspecialchars($info['device']) ?></span></td>
                             <td style="font-size:12px"><?= htmlspecialchars($info['browser']) ?></td>
+                            <td>
+                                <span style="color:<?= $threatLvl['color'] ?>;font-weight:700"><?= $threatLvl['icon'] ?> <?= $threatLvl['level'] ?></span>
+                            </td>
                             <td class="db-mono" style="font-size:11px;color:#64748b"><?= htmlspecialchars($info['last']) ?></td>
                         </tr>
                         <?php endforeach; ?>
                         <?php if (empty($topIPs)): ?>
-                        <tr><td colspan="9" style="text-align:center;padding:40px;color:#64748b">No IP data yet.</td></tr>
+                        <tr><td colspan="10" style="text-align:center;padding:40px;color:#64748b">No IP data yet.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -794,7 +1282,11 @@ var DB_DATA = {
     browsers: <?= $browJson ?>,
     os:       <?= $osJson ?>,
     online:   <?= $onlineCount ?>,
-    countryMap: <?= $countryMapJson ?>
+    countryMap: <?= $countryMapJson ?>,
+    hourly:   <?= $hourlyJson ?>,
+    ipThreats: <?= $ipThreatsJson ?>,
+    threatAlerts: <?= $threatAlertsJson ?>,
+    topReferers: <?= json_encode(array_slice($refererData, 0, 10), JSON_UNESCAPED_UNICODE) ?>
 };
 </script>
 <script src="dashboard.js"></script>

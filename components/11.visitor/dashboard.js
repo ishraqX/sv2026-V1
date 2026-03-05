@@ -220,6 +220,113 @@
         makeDonut('chartDeviceSec',  d.devices  || {});
         makeDonut('chartBrowserSec', d.browsers || {});
         makeDonut('chartOSSec',      d.os       || {});
+
+        // ── SECURITY: Threat Score Distribution ──
+        const threatDist = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0, SAFE: 0 };
+        const ipThreats = d.ipThreats || {};
+        Object.values(ipThreats).forEach(t => {
+            if (threatDist.hasOwnProperty(t.level)) threatDist[t.level]++;
+        });
+        const ctxThreatDist = getCanvas('chartThreatDist');
+        if (ctxThreatDist) {
+            new Chart(ctxThreatDist, {
+                type: 'bar',
+                data: {
+                    labels: ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'SAFE'],
+                    datasets: [{
+                        data: [threatDist.CRITICAL, threatDist.HIGH, threatDist.MEDIUM, threatDist.LOW, threatDist.SAFE],
+                        backgroundColor: ['#ef4444', '#f97316', '#eab308', '#3b82f6', '#22c55e'],
+                        borderRadius: 5,
+                        borderSkipped: false,
+                    }],
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { display: false },
+                    },
+                    scales: gridScales(),
+                },
+            });
+        }
+
+        // ── SECURITY: Hourly Traffic Chart ──
+        const hourlyData = d.hourly || [];
+        const hourlyLabels = [];
+        for (let h = 0; h < 24; h++) {
+            hourlyLabels.push(h.toString().padStart(2, '0') + ':00');
+        }
+        const ctxHourly = getCanvas('chartHourly');
+        if (ctxHourly && hourlyData.length) {
+            const hourlyGradient = ctxHourly.getContext('2d').createLinearGradient(0, 0, 0, 300);
+            hourlyGradient.addColorStop(0,   'rgba(249,115,22,0.40)');
+            hourlyGradient.addColorStop(0.6, 'rgba(249,115,22,0.10)');
+            hourlyGradient.addColorStop(1,   'rgba(249,115,22,0.00)');
+
+            new Chart(ctxHourly, {
+                type: 'line',
+                data: {
+                    labels: hourlyLabels,
+                    datasets: [{
+                        data: hourlyData,
+                        borderColor: '#f97316',
+                        backgroundColor: hourlyGradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#f97316',
+                        pointBorderColor: '#111827',
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 7,
+                    }],
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: { display: false },
+                    },
+                    scales: gridScales(),
+                },
+            });
+        }
+
+        // ── SECURITY: Referer Analysis Pie Chart ──
+        const referers = d.topReferers || {};
+        const refLabels = Object.keys(referers);
+        const refValues = Object.values(referers);
+        const ctxReferer = getCanvas('chartReferer');
+        if (ctxReferer && refLabels.length) {
+            new Chart(ctxReferer, {
+                type: 'pie',
+                data: {
+                    labels: refLabels.map(l => l === 'Direct' ? 'Direct Traffic' : (l.length > 30 ? l.substring(0, 27) + '...' : l)),
+                    datasets: [{
+                        data: refValues,
+                        backgroundColor: PALETTE.slice(0, refLabels.length),
+                        borderWidth: 2,
+                        borderColor: '#111827',
+                        hoverOffset: 12,
+                    }],
+                },
+                options: {
+                    ...CHART_DEFAULTS,
+                    plugins: {
+                        ...CHART_DEFAULTS.plugins,
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#94a3b8',
+                                font: { family: 'Space Grotesk', size: 10 },
+                                boxWidth: 10,
+                                padding: 6,
+                            },
+                        },
+                    },
+                },
+            });
+        }
     }
 
     // ── Navigation ──────────────────────────────────────────────
