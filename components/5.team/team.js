@@ -104,72 +104,157 @@
         var track = document.getElementById('svTmTrack');
         if (!outer || !track) return;
 
-        /* ── Get cards and setup state ── */
-        var cards = Array.from(track.querySelectorAll('.sv-tm-card'));
-        if (!cards.length) return;
+        /* ── Clone cards → infinite loop ── */
+        var origCards = Array.from(track.querySelectorAll('.sv-tm-card'));
+        if (!origCards.length) return;
 
-        var totalCards = cards.length;
-        var currentIdx = 0;
-        var isDragging = false;
-        var dragStartX = 0;
-        var dragDeltaX = 0;
-        var lastX = 0;
-        var velocity = 0;
+        origCards.forEach(function (card) {
+            var clone = card.cloneNode(true);
+            clone.setAttribute('aria-hidden', 'true');
+            track.appendChild(clone);
+        });
 
-        /* ── Card dimensions ── */
-        function getCardWidth() { return cards[0]?.offsetWidth || 280; }
-        function getGap() { return parseFloat(getComputedStyle(track).gap) || 24; }
-        function getStep() { return getCardWidth() + getGap(); }
+        /* ── Core state ── */
+        var setW         = 0;
+        var offset       = 0;
+        var currentSpeed = SVT_PPS;
+        var targetSpeed  = SVT_PPS;
+        var lastTs       = null;
 
-        /* ── Target translateX for centering a card ── */
-        function targetX(idx) {
-            var outerW = outer.offsetWidth;
-            var centerOffset = (outerW - getCardWidth()) / 2;
-            return centerOffset - idx * getStep();
+        /* ── Manual-control state ── */
+        var manualPaused = false;   /* true while user is interacting     */
+        var resumeTimer  = null;    /* setTimeout handle for auto-resume  */
+
+        /* nudge animation — smooth glide to target after arrow click */
+        var nudgeTarget  = null;    /* destination offset (px), or null   */
+        var nudgeSpeed   = 0;       /* current nudge velocity (px/frame)  */
+        var nudgeActive  = false;   /* prevent conflicting nudges         */
+
+        /* drag state */
+        var dragActive   = false;
+        var dragStartX   = 0;
+        var dragLastX    = 0;
+        var dragVelocity = 0;       /* exponential moving average         */
+
+        /* ── Measure one set width ── */
+        function measure() {
+            var gap = parseFloat(getComputedStyle(track).gap) || 24;
+            var w   = 0;
+            origCards.forEach(function (c) { w += c.offsetWidth + gap; });
+            setW = w;
         }
 
-        /* ── Apply transform with optional instant snap ── */
-        function setTransform(tx, instant) {
-            if (instant) {
-                track.classList.add('sv-tm-dragging');
-                track.style.transform = 'translateX(' + tx + 'px)';
-                void track.offsetWidth; // force reflow
-                track.classList.remove('sv-tm-dragging');
-            } else {
-                track.style.transform = 'translateX(' + tx + 'px)';
+        /* ── Wrap offset to [0, setW) ── */
+        function wrapOffset(v) {
+            if (setW <= 0) return v;
+            v = v % setW;
+            if (v < 0) v += setW;
+            return v;
+        }
+
+        /* ── Pause auto-scroll; restart after idle ── */
+        function pauseAuto() {
+            manualPaused = true;
+            targetSpeed  = 0;
+            clearTimeout(resumeTimer);
+        }
+
+        function scheduleResume() {
+            clearTimeout(resumeTimer);
+            resumeTimer = setTimeout(function () {
+                manualPaused = false;
+                /* Only resume if hover isn't still holding it paused */
+                if (!hoverPaused && !touchTogglePaused) {
+                    targetSpeed = SVT_PPS;
+                }
+            }, SVT_RESUME_DELAY);
+        }
+
+        /* ── Hover pause state ── */
+        var hoverPaused       = false;
+        var touchTogglePaused = false;
+
+        /* ── Step size: one card width + gap ── */
+        function cardStep() {
+            var gap = parseFloat(getComputedStyle(track).gap) || 24;
+            return (origCards[0] ? origCards[0].offsetWidth + gap : 300);
+        }
+
+        /* ══════════════════════════════════════════
+           RAF TICK
+           Handles auto-scroll + nudge animation.
+           Drag writes directly to offset so tick
+           just needs to clamp + render.
+        ══════════════════════════════════════════ */
+        function tick(ts) {
+            /* 1. Ease auto-scroll speed */
+            currentSpeed += (targetSpeed - currentSpeed) * 0.07;
+
+            if (setW > 0) {
+                if (!dragActive) {
+                    /* 2a. Nudge animation (arrow click smooth glide) */
+                    if (nudgeTarget !== null) {
+                        var remaining = nudgeTarget - offset;
+
+                        /* Normalise remaining across the wrap boundary */
+                        if (remaining > setW / 2)  remaining -= setW;
+                        if (remaining < -setW / 2) remaining += setW;
+
+                        /* Spring toward target — stronger damping to prevent oscillation
+                           0.18 accel + 0.88 damping → smooth, stable settle */
+                        nudgeSpeed += remaining * 0.18;
+                        nudgeSpeed *= 0.88;          /* stronger damping — prevents jitter */
+                        offset     += nudgeSpeed;
+
+                        /* Only wrap offset when animation is complete to prevent jumps */
+                        if (Math.abs(remaining) < 0.5 && Math.abs(nudgeSpeed) < 0.15) {
+                            offset      = wrapOffset(nudgeTarget);
+                            nudgeTarget = null;
+                            nudgeSpeed  = 0;
+                            nudgeActive = false;
+                            scheduleResume();         /* resume auto after glide */
+                        }
+
+                        track.style.transform = 'translateX(-' + offset.toFixed(2) + 'px)';
+                        lastTs = null;                /* don't auto-advance while nudging */
+
+                    /* 2b. Auto-scroll */
+                    } else if (currentSpeed > 0.4 || targetSpeed > 0) {
+                        if (lastTs !== null) {
+                            var delta = Math.min((ts - lastTs) / 1000, 0.05);
+                            offset += currentSpeed * delta;
+                            if (offset >= setW) offset -= setW;
+                            track.style.transform = 'translateX(-' + offset.toFixed(2) + 'px)';
+                        }
+                        lastTs = ts;
+                    } else {
+                        lastTs = null;
+                    }
+                }
+                /* drag: offset already updated in pointermove/touchmove */
             }
+
+            requestAnimationFrame(tick);
         }
 
-        /* ── Update active states ── */
-        function applyState(idx, instant) {
-            idx = Math.max(0, Math.min(totalCards - 1, idx));
-            currentIdx = idx;
-
-            cards.forEach(function(card, i) {
-                card.classList.toggle('sv-tm-active', i === idx);
-                card.classList.toggle('sv-tm-adjacent', Math.abs(i - idx) === 1);
-            });
-
-            setTransform(targetX(idx), instant);
-        }
-
-        /* ── Smooth navigation to index ── */
-        function goTo(idx) {
-            applyState(idx, false); // false = use CSS transition for smooth movement
-        }
-
-        /* ── Build arrows ── */
+        /* ══════════════════════════════════════════
+           ARROW BUTTONS
+           Injected into the DOM around the outer wrapper.
+           Each click nudges offset by one card step.
+        ══════════════════════════════════════════ */
         function buildArrows() {
+            /* Wrap outer in a relative container so arrows can be positioned */
             var col = outer.closest('.sv-tm-scroll-col') || outer.parentElement;
             if (!col) return;
 
+            /* Make the col the positioning parent */
             col.style.position = 'relative';
 
             function makeBtn(dir) {
                 var btn = document.createElement('button');
-                btn.className = 'sv-tm-arrow sv-tm-arrow--' + dir;
-                btn.setAttribute('aria-label', dir === 'prev' ? 'Previous team member' : 'Next team member');
-                btn.innerHTML = dir === 'prev'
+                btn.className    = 'sv-tm-arrow sv-tm-arrow--' + dir;
+                btn.setAttribute('aria-label', dir === 'prev' ? 'Scroll left' : 'Scroll right');
+                btn.innerHTML    = dir === 'prev'
                     ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>'
                     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
                 return btn;
@@ -181,112 +266,141 @@
             col.appendChild(prevBtn);
             col.appendChild(nextBtn);
 
-            /* Smooth directional navigation */
-            prevBtn.addEventListener('click', function() {
-                goTo(currentIdx - 1 < 0 ? totalCards - 1 : currentIdx - 1);
+            /* Click handlers — nudge offset by ±cardStep */
+            prevBtn.addEventListener('click', function () {
+                if (setW <= 0 || nudgeActive) return;  /* prevent overlapping nudges */
+                pauseAuto();
+                nudgeSpeed  = 0;
+                nudgeTarget = wrapOffset(offset - cardStep());
+                nudgeActive = true;
             });
 
-            nextBtn.addEventListener('click', function() {
-                goTo((currentIdx + 1) % totalCards);
+            nextBtn.addEventListener('click', function () {
+                if (setW <= 0 || nudgeActive) return;  /* prevent overlapping nudges */
+                pauseAuto();
+                nudgeSpeed  = 0;
+                nudgeTarget = wrapOffset(offset + cardStep());
+                nudgeActive = true;
             });
         }
 
-        /* ── Drag functionality ── */
+        /* ══════════════════════════════════════════
+           DRAG / SWIPE  (mouse + touch)
+           Pointer events — one handler for both.
+           Falls back to individual mouse/touch events
+           if PointerEvent not supported.
+        ══════════════════════════════════════════ */
         var supportsPointer = (typeof PointerEvent !== 'undefined');
 
         function onDragStart(clientX) {
-            isDragging = true;
-            dragStartX = clientX;
-            dragDeltaX = 0;
-            lastX = clientX;
-            velocity = 0;
-            track.classList.add('sv-tm-dragging');
+            dragActive   = true;
+            dragStartX   = clientX;
+            dragLastX    = clientX;
+            dragVelocity = 0;
+            nudgeTarget  = null;   /* cancel any in-progress nudge */
+            nudgeSpeed   = 0;
+            nudgeActive  = false;  /* reset nudge state */
+            pauseAuto();
+            outer.classList.add('sv-tm-dragging');
         }
 
         function onDragMove(clientX) {
-            if (!isDragging) return;
-            var dx = lastX - clientX;
-            dragDeltaX += Math.abs(dx);
-            velocity = velocity * 0.8 + dx * 0.2;
-            lastX = clientX;
-
-            var currentX = targetX(currentIdx);
-            setTransform(currentX - (clientX - dragStartX), true);
+            if (!dragActive) return;
+            var dx = dragLastX - clientX;          /* positive = scroll right */
+            dragVelocity = dragVelocity * 0.8 + dx * 0.2; /* EMA — smoother, less noisy, stronger smoothing */
+            dragLastX    = clientX;
+            offset       = wrapOffset(offset + dx);
+            track.style.transform = 'translateX(-' + offset.toFixed(2) + 'px)';
         }
 
         function onDragEnd() {
-            if (!isDragging) return;
-            isDragging = false;
-            track.classList.remove('sv-tm-dragging');
+            if (!dragActive) return;
+            dragActive = false;
+            outer.classList.remove('sv-tm-dragging');
 
-            /* Determine target based on drag distance and velocity */
-            var dragDistance = Math.abs(dragStartX - lastX);
-            var threshold = getCardWidth() * 0.3; // 30% of card width
-
-            var targetIdx = currentIdx;
-            if (dragDistance > threshold || Math.abs(velocity) > 15) {
-                if (velocity > 0 || dragStartX - lastX > threshold) {
-                    targetIdx = (currentIdx + 1) % totalCards;
-                } else if (velocity < 0 || lastX - dragStartX > threshold) {
-                    targetIdx = currentIdx - 1 < 0 ? totalCards - 1 : currentIdx - 1;
-                }
+            /* Momentum coast: apply remaining velocity as a nudge target */
+            if (Math.abs(dragVelocity) > 1.5 && !nudgeActive) {  /* don't start nudge if one is active */
+                var coast = dragVelocity * 10;      /* coast distance in px — reduced for stability */
+                nudgeTarget = wrapOffset(offset + coast);
+                nudgeSpeed  = dragVelocity * 0.4;   /* reduced momentum for stability */
+                nudgeActive = true;
+            } else {
+                scheduleResume();
             }
-
-            goTo(targetIdx);
         }
 
-        /* ── Event listeners ── */
         if (supportsPointer) {
-            outer.addEventListener('pointerdown', function(e) {
-                if (e.button !== 0) return;
+            outer.addEventListener('pointerdown', function (e) {
+                if (e.button !== 0) return;        /* left button only */
                 outer.setPointerCapture(e.pointerId);
                 onDragStart(e.clientX);
             });
-            outer.addEventListener('pointermove', function(e) {
-                if (!isDragging) return;
+            outer.addEventListener('pointermove', function (e) {
+                if (!dragActive) return;
                 e.preventDefault();
                 onDragMove(e.clientX);
             }, { passive: false });
-            outer.addEventListener('pointerup', onDragEnd);
-            outer.addEventListener('pointercancel', onDragEnd);
+            outer.addEventListener('pointerup',     function (e) { onDragEnd(); });
+            outer.addEventListener('pointercancel', function (e) { onDragEnd(); });
         } else {
-            outer.addEventListener('mousedown', function(e) {
+            /* Mouse fallback */
+            outer.addEventListener('mousedown', function (e) {
                 if (e.button !== 0) return;
                 onDragStart(e.clientX);
             });
-            window.addEventListener('mousemove', function(e) { onDragMove(e.clientX); });
-            window.addEventListener('mouseup', onDragEnd);
+            window.addEventListener('mousemove', function (e) { onDragMove(e.clientX); });
+            window.addEventListener('mouseup',   function ()  { onDragEnd(); });
 
-            outer.addEventListener('touchstart', function(e) {
+            /* Touch fallback */
+            outer.addEventListener('touchstart', function (e) {
                 onDragStart(e.touches[0].clientX);
             }, { passive: true });
-            outer.addEventListener('touchmove', function(e) {
+            outer.addEventListener('touchmove', function (e) {
                 e.preventDefault();
                 onDragMove(e.touches[0].clientX);
             }, { passive: false });
-            outer.addEventListener('touchend', onDragEnd);
+            outer.addEventListener('touchend', function () { onDragEnd(); });
         }
 
-        /* ── Hover pause ── */
-        outer.addEventListener('mouseenter', function() {
-            // Could add hover pause logic here if needed
+        /* ══════════════════════════════════════════
+           EXISTING HOVER PAUSE  (kept intact)
+        ══════════════════════════════════════════ */
+        outer.addEventListener('mouseenter', function () {
+            hoverPaused = true;
+            targetSpeed = 0;
         });
-        outer.addEventListener('mouseleave', function() {
-            // Could add hover resume logic here if needed
+        outer.addEventListener('mouseleave', function () {
+            hoverPaused = false;
+            if (!manualPaused && !touchTogglePaused) targetSpeed = SVT_PPS;
         });
 
-        /* ── Resize handling ── */
+        /* ── Visibility API ── */
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible' && !touchTogglePaused && !manualPaused) {
+                targetSpeed = SVT_PPS;
+                lastTs      = null;
+            }
+        });
+
+        /* ── Resize ── */
         var resizeTimer;
-        window.addEventListener('resize', function() {
+        window.addEventListener('resize', function () {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                applyState(currentIdx, true);
-            }, 200);
+            resizeTimer = setTimeout(function () {
+                measure();
+                if (setW > 0 && offset >= setW) offset = offset % setW;
+            }, 220);
         });
 
-        /* ── Initialize ── */
+        /* ── Build arrows then start ── */
         buildArrows();
-        applyState(0, true); // Start with first card centered
+
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                measure();
+                requestAnimationFrame(tick);
+            });
+        });
     }
 
 })();
