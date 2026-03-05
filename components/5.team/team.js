@@ -128,6 +128,7 @@
         /* nudge animation — smooth glide to target after arrow click */
         var nudgeTarget  = null;    /* destination offset (px), or null   */
         var nudgeSpeed   = 0;       /* current nudge velocity (px/frame)  */
+        var nudgeActive  = false;   /* prevent conflicting nudges         */
 
         /* drag state */
         var dragActive   = false;
@@ -199,18 +200,18 @@
                         if (remaining > setW / 2)  remaining -= setW;
                         if (remaining < -setW / 2) remaining += setW;
 
-                        /* Spring toward target — tuned to match award section feel.
-                           0.22 accel + 0.78 damping → fast start, slight overshoot, clean settle */
-                        nudgeSpeed += remaining * 0.22;
-                        nudgeSpeed *= 0.78;          /* damping — lower = bouncier */
+                        /* Spring toward target — stronger damping to prevent oscillation
+                           0.18 accel + 0.88 damping → smooth, stable settle */
+                        nudgeSpeed += remaining * 0.18;
+                        nudgeSpeed *= 0.88;          /* stronger damping — prevents jitter */
                         offset     += nudgeSpeed;
-                        offset      = wrapOffset(offset);
 
-                        /* Close enough → snap and clear */
-                        if (Math.abs(remaining) < 0.3 && Math.abs(nudgeSpeed) < 0.2) {
-                            offset     = wrapOffset(nudgeTarget);
+                        /* Only wrap offset when animation is complete to prevent jumps */
+                        if (Math.abs(remaining) < 0.5 && Math.abs(nudgeSpeed) < 0.15) {
+                            offset      = wrapOffset(nudgeTarget);
                             nudgeTarget = null;
                             nudgeSpeed  = 0;
+                            nudgeActive = false;
                             scheduleResume();         /* resume auto after glide */
                         }
 
@@ -267,17 +268,19 @@
 
             /* Click handlers — nudge offset by ±cardStep */
             prevBtn.addEventListener('click', function () {
-                if (setW <= 0) return;
+                if (setW <= 0 || nudgeActive) return;  /* prevent overlapping nudges */
                 pauseAuto();
                 nudgeSpeed  = 0;
                 nudgeTarget = wrapOffset(offset - cardStep());
+                nudgeActive = true;
             });
 
             nextBtn.addEventListener('click', function () {
-                if (setW <= 0) return;
+                if (setW <= 0 || nudgeActive) return;  /* prevent overlapping nudges */
                 pauseAuto();
                 nudgeSpeed  = 0;
                 nudgeTarget = wrapOffset(offset + cardStep());
+                nudgeActive = true;
             });
         }
 
@@ -296,6 +299,7 @@
             dragVelocity = 0;
             nudgeTarget  = null;   /* cancel any in-progress nudge */
             nudgeSpeed   = 0;
+            nudgeActive  = false;  /* reset nudge state */
             pauseAuto();
             outer.classList.add('sv-tm-dragging');
         }
@@ -303,7 +307,7 @@
         function onDragMove(clientX) {
             if (!dragActive) return;
             var dx = dragLastX - clientX;          /* positive = scroll right */
-            dragVelocity = dragVelocity * 0.72 + dx * 0.28; /* EMA — smoother, less noisy */
+            dragVelocity = dragVelocity * 0.8 + dx * 0.2; /* EMA — smoother, less noisy, stronger smoothing */
             dragLastX    = clientX;
             offset       = wrapOffset(offset + dx);
             track.style.transform = 'translateX(-' + offset.toFixed(2) + 'px)';
@@ -315,10 +319,11 @@
             outer.classList.remove('sv-tm-dragging');
 
             /* Momentum coast: apply remaining velocity as a nudge target */
-            if (Math.abs(dragVelocity) > 1.5) {
-                var coast = dragVelocity * 12;      /* coast distance in px — tighter than before */
+            if (Math.abs(dragVelocity) > 1.5 && !nudgeActive) {  /* don't start nudge if one is active */
+                var coast = dragVelocity * 10;      /* coast distance in px — reduced for stability */
                 nudgeTarget = wrapOffset(offset + coast);
-                nudgeSpeed  = dragVelocity * 0.5;
+                nudgeSpeed  = dragVelocity * 0.4;   /* reduced momentum for stability */
+                nudgeActive = true;
             } else {
                 scheduleResume();
             }

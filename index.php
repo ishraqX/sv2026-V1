@@ -189,7 +189,7 @@ if (!isset($_SESSION[$session_key])) {
     </script>
 
     <!-- Scripts -->
-    <script src="assets/js/combined.min.js"></script>
+    <script src="assets/js/combined.js"></script>
 
 </body>
 </html>
