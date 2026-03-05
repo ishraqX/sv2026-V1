@@ -666,13 +666,19 @@
     );
 }
 
-/* Track — JS RAF drives translateX, no CSS animation at all */
+/* Track — smooth transitions for navigation */
 .sv-tm-scroll-track {
     display:     flex;
     gap:         var(--tm-gap);
     align-items: stretch;
-    padding:     20px 0;       /* breathing room for hover lift */
+    padding:     20px 0;
     will-change: transform;
+    transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Disable transitions during drag for instant updates */
+.sv-tm-dragging .sv-tm-scroll-track {
+    transition: none;
 }
 
 /* ── Member card ── */
@@ -701,6 +707,19 @@
     border-color: var(--tm-bdr-md);
     z-index:      30;
 }
+
+/* Active card (centered) */
+.sv-tm-active {
+    border-color: var(--tm-bdr-md);
+    box-shadow:   var(--tm-sh-hover);
+}
+
+/* Adjacent cards (next to active) */
+.sv-tm-adjacent {
+    border-color: var(--tm-bdr-gold);
+    box-shadow:   var(--tm-sh-card);
+}
+
 .sv-tm-card:focus-visible {
     outline:        2px solid var(--tm-teal);
     outline-offset: 3px;
