@@ -170,7 +170,24 @@ $visitorFile  = __DIR__ . '/data/visitor.txt';
 $userDataFile = __DIR__ . '/data/user-data.txt';
 $onlineFile   = __DIR__ . '/data/online-user.txt';
 
-// ── Load data ─────────────────────────────────────────────────
+// ── Month/Year filtering ──────────────────────────────────────
+$filterMonth = $_GET['month'] ?? '';
+$filterYear  = $_GET['year'] ?? '';
+$availableMonths = [];
+
+// Scan for available monthly data files
+$dataDir = __DIR__ . '/data';
+if (is_dir($dataDir)) {
+    $files = scandir($dataDir);
+    foreach ($files as $file) {
+        if (preg_match('/^user-data-(\d{4}-\d{2})\.txt$/', $file, $m)) {
+            $availableMonths[] = $m[1];
+        }
+    }
+    rsort($availableMonths); // Most recent first
+}
+
+// ── Load data (with month/year filtering) ─────────────────────
 
 $totalVisitors = file_exists($visitorFile) ? (int)trim(file_get_contents($visitorFile)) : 0;
 
@@ -185,24 +202,58 @@ if (file_exists($onlineFile)) {
 }
 
 $rows = [];
-if (file_exists($userDataFile)) {
-    $lines = file($userDataFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
-    foreach ($lines as $l) {
-        $p = explode('|', $l);
-        if (count($p) >= 11) {
-            $rows[] = [
-                'datetime'    => $p[0],
-                'ip'          => $p[1],
-                'country'     => $p[2],
-                'countryCode' => $p[3],
-                'city'        => $p[4],
-                'region'      => $p[5],
-                'device'      => $p[6],
-                'os'          => $p[7],
-                'browser'     => $p[8],
-                'referer'     => $p[9],
-                'page'        => $p[10],
-            ];
+$dataFiles = [];
+
+// If filtering by month/year, load only that file
+if (!empty($filterMonth) && !empty($filterYear)) {
+    $targetFile = __DIR__ . "/data/user-data-{$filterYear}-{$filterMonth}.txt";
+    if (file_exists($targetFile)) {
+        $dataFiles[] = $targetFile;
+    }
+} elseif (!empty($filterMonth)) {
+    $targetFile = __DIR__ . "/data/user-data-{$filterMonth}.txt";
+    if (file_exists($targetFile)) {
+        $dataFiles[] = $targetFile;
+    }
+} elseif (!empty($filterYear)) {
+    // Load all files for the year
+    foreach ($availableMonths as $ym) {
+        if (strpos($ym, $filterYear . '-') === 0) {
+            $targetFile = __DIR__ . "/data/user-data-{$ym}.txt";
+            if (file_exists($targetFile)) {
+                $dataFiles[] = $targetFile;
+            }
+        }
+    }
+} else {
+    // Load all available monthly files + main file for backward compatibility
+    $dataFiles[] = $userDataFile;
+    foreach ($availableMonths as $ym) {
+        $dataFiles[] = __DIR__ . "/data/user-data-{$ym}.txt";
+    }
+}
+
+// Load data from selected files
+foreach ($dataFiles as $file) {
+    if (file_exists($file)) {
+        $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+        foreach ($lines as $l) {
+            $p = explode('|', $l);
+            if (count($p) >= 11) {
+                $rows[] = [
+                    'datetime'    => $p[0],
+                    'ip'          => $p[1],
+                    'country'     => $p[2],
+                    'countryCode' => $p[3],
+                    'city'        => $p[4],
+                    'region'      => $p[5],
+                    'device'      => $p[6],
+                    'os'          => $p[7],
+                    'browser'     => $p[8],
+                    'referer'     => $p[9],
+                    'page'        => $p[10],
+                ];
+            }
         }
     }
 }
@@ -609,9 +660,38 @@ function flag(string $cc): string {
             <p class="db-page-date">Last updated: <?= date('D, d M Y · H:i') ?></p>
         </div>
         <div class="db-topbar-right">
+            <!-- Month/Year Filter -->
+            <form method="GET" style="display:flex;gap:8px;margin-right:8px">
+                <select name="year" class="db-filter-select" onchange="this.form.submit()">
+                    <option value="">All Years</option>
+                    <?php
+                    $years = [];
+                    foreach ($availableMonths as $ym) {
+                        $year = explode('-', $ym)[0];
+                        if (!in_array($year, $years)) $years[] = $year;
+                    }
+                    rsort($years);
+                    foreach ($years as $y): ?>
+                    <option value="<?= $y ?>" <?= $filterYear === $y ? 'selected' : '' ?>><?= $y ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select name="month" class="db-filter-select" onchange="this.form.submit()">
+                    <option value="">All Months</option>
+                    <?php
+                    $months = ['01'=>'Jan','02'=>'Feb','03'=>'Mar','04'=>'Apr','05'=>'May','06'=>'Jun',
+                              '07'=>'Jul','08'=>'Aug','09'=>'Sep','10'=>'Oct','11'=>'Nov','12'=>'Dec'];
+                    foreach ($months as $m => $name): ?>
+                    <option value="<?= $m ?>" <?= $filterMonth === $m ? 'selected' : '' ?>><?= $name ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <?php if ($filterMonth || $filterYear): ?>
+                <a href="dashboard.php" class="db-back-btn" style="padding:6px 12px"><i class="fas fa-times"></i></a>
+                <?php endif; ?>
+            </form>
+            
             <div style="display:flex;gap:8px">
-                <a href="dashboard.php?export=csv" class="db-back-btn" title="Export as CSV"><i class="fas fa-download"></i> CSV</a>
-                <a href="dashboard.php?export=json" class="db-back-btn" title="Export as JSON"><i class="fas fa-download"></i> JSON</a>
+                <a href="dashboard.php?export=csv<?= $filterMonth ? '&month=' . $filterMonth : '' ?><?= $filterYear ? '&year=' . $filterYear : '' ?>" class="db-back-btn" title="Export as CSV"><i class="fas fa-download"></i> CSV</a>
+                <a href="dashboard.php?export=json<?= $filterMonth ? '&month=' . $filterMonth : '' ?><?= $filterYear ? '&year=' . $filterYear : '' ?>" class="db-back-btn" title="Export as JSON"><i class="fas fa-download"></i> JSON</a>
             </div>
             <a href="../../index.php" class="db-back-btn"><i class="fas fa-arrow-left"></i> Back to Site</a>
             <?php if (!$sv_is_local): ?>
@@ -806,7 +886,7 @@ function flag(string $cc): string {
                                 </div>
                             </td>
                             <td class="db-num"><strong><?= $alert['visits'] ?></strong></td>
-                            <td><?= flag($countries[array_search($alert['country'], array_column($rows, 'country'))][0] ?? 'XX') ?? '🌐' ?> <?= htmlspecialchars($alert['country']) ?></td>
+                            <td><?= htmlspecialchars($alert['country']) ?></td>
                             <td><?= $alert['isBot'] ? '<span style="color:#f97316">🤖 Bot</span>' : '<span style="color:#22c55e">Human</span>' ?></td>
                             <td><button class="db-btn-small" onclick="alert('IP: ' + '<?= addslashes($alert['ip']) ?>' + '\\nVisits: ' + '<?= $alert['visits'] ?>' + '\\nThreat Score: ' + '<?= $alert['score'] ?>')">Review</button></td>
                         </tr>
@@ -1014,7 +1094,7 @@ function flag(string $cc): string {
                         foreach ($countries as $cn => $cv): ?>
                         <tr>
                             <td class="db-rank"><?= $rank++ ?></td>
-                            <td><?= flag($countryCodeMap[$cn] ?? 'XX') ?> <?= htmlspecialchars($cn) ?></td>
+                            <td><?= htmlspecialchars($cn) ?></td>
                             <td class="db-num"><?= number_format($cv) ?></td>
                             <td class="db-num"><?= $totalUnique > 0 ? round($cv / $totalUnique * 100, 1) : 0 ?>%</td>
                             <td style="min-width:120px">
@@ -1127,7 +1207,7 @@ function flag(string $cc): string {
                             <td class="db-mono db-nowrap" style="font-size:11px"><?= htmlspecialchars($r['datetime']) ?></td>
                             <td class="db-ip-cell"><?= htmlspecialchars($r['ip']) ?></td>
                             <td><span class="db-visits-badge <?= $visitsForIp > 1 ? 'multi' : '' ?>"><?= $visitsForIp ?>x</span></td>
-                            <td><?= flag($r['countryCode']) ?> <?= htmlspecialchars($r['country']) ?></td>
+                            <td><?= htmlspecialchars($r['country']) ?></td>
                             <td style="color:#94a3b8;font-size:12px"><?= htmlspecialchars($r['city']) ?></td>
                             <td><span class="db-tag db-tag--<?= strtolower($r['device']) ?>"><?= htmlspecialchars($r['device']) ?></span></td>
                             <td style="font-size:12px"><?= htmlspecialchars($r['os']) ?></td>
@@ -1251,7 +1331,7 @@ function flag(string $cc): string {
                                     <div class="db-progress-bar" style="width:<?= $maxIPCount > 0 ? round($cnt/$maxIPCount*100) : 0 ?>%"></div>
                                 </div>
                             </td>
-                            <td><?= flag($info['countryCode']) ?> <?= htmlspecialchars($info['country']) ?></td>
+                            <td><?= htmlspecialchars($info['country']) ?></td>
                             <td style="color:#94a3b8;font-size:12px"><?= htmlspecialchars($info['city']) ?></td>
                             <td><span class="db-tag db-tag--<?= strtolower($info['device']) ?>"><?= htmlspecialchars($info['device']) ?></span></td>
                             <td style="font-size:12px"><?= htmlspecialchars($info['browser']) ?></td>

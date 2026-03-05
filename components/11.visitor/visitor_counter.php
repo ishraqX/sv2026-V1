@@ -7,6 +7,10 @@
 
 $sv_visitorFile  = __DIR__ . '/data/visitor.txt';
 $sv_userDataFile = __DIR__ . '/data/user-data.txt';
+
+// ── Historical data: save by month/year ──────────────────────────────────
+$sv_yearMonth    = date('Y-m');
+$sv_userDataFileMonthly = __DIR__ . "/data/user-data-{$sv_yearMonth}.txt";
 $sv_onlineFile   = __DIR__ . '/data/online-user.txt';
 
 if (!is_dir(__DIR__ . '/data')) {
@@ -146,7 +150,7 @@ $sv_dev = sv_parse_ua($sv_ua);
 // Increment total on every page load
 $sv_totalCount = sv_increment_total($sv_visitorFile);
 
-// Log every visit with FULL IP
+// Log every visit with FULL IP (to both main and monthly files)
 $sv_row = implode('|', [
     $sv_now,
     $sv_ip,                                           // FULL IP - no masking
@@ -161,6 +165,7 @@ $sv_row = implode('|', [
     preg_replace('/\|/', ' ', $sv_page),
 ]);
 file_put_contents($sv_userDataFile, $sv_row . "\n", FILE_APPEND | LOCK_EX);
+file_put_contents($sv_userDataFileMonthly, $sv_row . "\n", FILE_APPEND | LOCK_EX);
 
 // Display values
 $sv_flag        = sv_flag($sv_geo['countryCode']);

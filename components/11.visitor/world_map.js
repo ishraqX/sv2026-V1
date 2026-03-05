@@ -61,13 +61,33 @@
     }
 
     function countToColor(count, maxCount) {
-        if (!count) return '#0d2040';
-        const t = Math.pow(count / maxCount, 0.38);
-        const stops = [[7,31,53],[13,58,82],[18,87,128],[29,111,181],[59,130,246],[96,165,250],[147,197,253]];
-        const idx   = Math.min(Math.floor(t * (stops.length - 1)), stops.length - 2);
-        const frac  = t * (stops.length - 1) - idx;
-        const a = stops[idx], b = stops[idx + 1];
+        if (!count) return '#1a1a2e';
+        const intensity = Math.pow(count / maxCount, 0.4);
+        // Enhanced color palette: deep blue → cyan → bright blue → white
+        const colors = [
+            [26, 26, 46],    // Deep dark blue
+            [15, 52, 67],    // Dark teal
+            [0, 87, 128],    // Medium blue
+            [29, 111, 181],  // Light blue
+            [59, 130, 246],  // Bright blue
+            [96, 165, 250],  // Lighter blue
+            [147, 197, 253], // Very light blue
+            [219, 234, 254], // Pale blue
+            [255, 255, 255]  // White for max
+        ];
+        const idx = Math.min(Math.floor(intensity * (colors.length - 1)), colors.length - 2);
+        const frac = intensity * (colors.length - 1) - idx;
+        const a = colors[idx], b = colors[idx + 1];
         return `rgb(${Math.round(a[0]+(b[0]-a[0])*frac)},${Math.round(a[1]+(b[1]-a[1])*frac)},${Math.round(a[2]+(b[2]-a[2])*frac)})`;
+    }
+
+    function getSizeClass(count, maxCount) {
+        const ratio = count / maxCount;
+        if (ratio >= 0.8) return 'xl';
+        if (ratio >= 0.6) return 'lg';
+        if (ratio >= 0.4) return 'md';
+        if (ratio >= 0.2) return 'sm';
+        return 'xs';
     }
 
     function initMap() {
@@ -81,18 +101,33 @@
 
         /* ── Create map ── */
         const map = L.map('world-map-leaflet', {
-            center: [20, 10], zoom: 2, minZoom: 2, maxZoom: 10,
-            zoomControl: true, scrollWheelZoom: true,
+            center: [20, 10],
+            zoom: 2,
+            minZoom: 1,
+            maxZoom: 8,
+            zoomControl: true,
+            scrollWheelZoom: true,
             worldCopyJump: true,
+            fadeAnimation: true,
+            zoomAnimation: true
         });
 
-        /* CartoDB Dark Matter tiles — free, no API key */
+        /* Enhanced tile layer with better styling */
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> &copy; <a href="https://carto.com">CARTO</a>',
-            subdomains: 'abcd', maxZoom: 19,
+            subdomains: 'abcd',
+            maxZoom: 19,
+            opacity: 0.9
         }).addTo(map);
 
-        /* ── Place a circle marker for every country with data ── */
+        /* Add subtle grid overlay */
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            opacity: 0.03,
+            attribution: ''
+        }).addTo(map);
+
+        /* ── Place enhanced markers for every country with data ── */
+        const markers = [];
         mapData.forEach((item, rank) => {
             const cc  = (item.code || '').toUpperCase();
             const pos = CC[cc];
@@ -101,48 +136,120 @@
             const count  = item.count || 0;
             const pct    = ((count / total) * 100).toFixed(1);
             const color  = countToColor(count, maxCount);
-            const radius = Math.max(7, Math.min(30, 7 + Math.sqrt(count / maxCount) * 23));
+            const sizeClass = getSizeClass(count, maxCount);
 
-            /* Main filled circle */
+            // Dynamic sizing based on zoom and data
+            const baseRadius = Math.max(4, Math.min(25, 4 + Math.sqrt(count / maxCount) * 21));
+            const radius = baseRadius * (map.getZoom() / 2);
+
+            /* Enhanced circle marker with glow effect */
             const circle = L.circleMarker(pos, {
                 radius,
                 fillColor:   color,
-                color:       'rgba(255,255,255,0.4)',
-                weight:      1,
-                opacity:     0.7,
-                fillOpacity: 0.82,
+                color:       'rgba(255,255,255,0.6)',
+                weight:      2,
+                opacity:     0.8,
+                fillOpacity: 0.85,
+                className:   `sv-marker sv-marker-${sizeClass}`
             }).addTo(map);
 
-            /* Tooltip */
+            /* Rich tooltip with enhanced styling */
             circle.bindTooltip(
-                `<div class="sv-tt-inner">
-                    <div class="sv-tt-head">${flagEmoji(cc)} <strong>${item.name}</strong></div>
-                    <div class="sv-tt-visits">${count.toLocaleString()} visits</div>
-                    <div class="sv-tt-pct">${pct}% of traffic · click to lookup</div>
+                `<div class="sv-tt-enhanced">
+                    <div class="sv-tt-header">
+                        <div class="sv-tt-flag">${flagEmoji(cc)}</div>
+                        <div class="sv-tt-country">${item.name}</div>
+                        <div class="sv-tt-rank">#${rank + 1}</div>
+                    </div>
+                    <div class="sv-tt-stats">
+                        <div class="sv-tt-visits">${count.toLocaleString()} visits</div>
+                        <div class="sv-tt-pct">${pct}% of traffic</div>
+                        <div class="sv-tt-intensity">Intensity: ${sizeClass.toUpperCase()}</div>
+                    </div>
+                    <div class="sv-tt-action">Click to explore →</div>
                 </div>`,
-                { sticky: true, opacity: 1, className: 'sv-map-tt' }
+                {
+                    sticky: true,
+                    opacity: 1,
+                    className: 'sv-map-tt-enhanced',
+                    offset: [0, -10]
+                }
             );
 
-            /* Click → open ipinfo in new tab */
-            circle.on('click', () => {
+            /* Enhanced click handler with zoom */
+            circle.on('click', (e) => {
+                L.DomEvent.stopPropagation(e);
+                map.setView(pos, Math.max(4, map.getZoom() + 1), { animate: true });
                 const q = encodeURIComponent(item.name);
-                window.open(`https://ipinfo.io/countries/${cc.toLowerCase()}`, '_blank');
+                setTimeout(() => {
+                    window.open(`https://ipinfo.io/countries/${cc.toLowerCase()}`, '_blank');
+                }, 500);
             });
 
-            /* Pulse ring for top 12 countries */
-            if (rank < 12) {
+            /* Hover effects */
+            circle.on('mouseover', function() {
+                this.setStyle({
+                    fillOpacity: 1,
+                    weight: 3,
+                    color: 'rgba(255,255,255,0.9)'
+                });
+            });
+
+            circle.on('mouseout', function() {
+                this.setStyle({
+                    fillOpacity: 0.85,
+                    weight: 2,
+                    color: 'rgba(255,255,255,0.6)'
+                });
+            });
+
+            /* Pulse ring for top countries with enhanced animation */
+            if (rank < 8) {
                 const pulseEl = document.createElement('div');
-                pulseEl.className = 'sv-pulse';
-                pulseEl.style.cssText = `width:${radius*4}px;height:${radius*4}px;border-color:${color};animation-delay:${rank * 0.12}s`;
-                const pulseIcon = L.divIcon({ html: pulseEl, className: '', iconSize: [radius*4, radius*4], iconAnchor: [radius*2, radius*2] });
-                L.marker(pos, { icon: pulseIcon, interactive: false, zIndexOffset: -100 }).addTo(map);
+                pulseEl.className = 'sv-pulse-enhanced';
+                pulseEl.style.cssText = `
+                    width:${radius*3}px;
+                    height:${radius*3}px;
+                    border-color:${color};
+                    animation-delay:${rank * 0.15}s;
+                    animation-duration: ${3 + rank * 0.5}s;
+                `;
+                const pulseIcon = L.divIcon({
+                    html: pulseEl,
+                    className: '',
+                    iconSize: [radius*3, radius*3],
+                    iconAnchor: [radius*1.5, radius*1.5]
+                });
+                L.marker(pos, {
+                    icon: pulseIcon,
+                    interactive: false,
+                    zIndexOffset: -100
+                }).addTo(map);
             }
+
+            markers.push({ marker: circle, pos, count, rank });
         });
 
-        /* ── Status ── */
+        /* ── Dynamic marker sizing on zoom ── */
+        map.on('zoomend', function() {
+            const zoom = map.getZoom();
+            const zoomFactor = zoom / 2;
+            markers.forEach(({ marker, count }) => {
+                const baseRadius = Math.max(4, Math.min(25, 4 + Math.sqrt(count / maxCount) * 21));
+                const newRadius = baseRadius * zoomFactor;
+                marker.setRadius(newRadius);
+            });
+        });
+
+        /* ── Enhanced status ── */
         const statusEl = document.getElementById('mapStatus');
         if (statusEl) {
-            statusEl.textContent = 'FEED ACTIVE // ' + mapData.length + ' NODES';
+            const topCountry = mapData[0];
+            statusEl.innerHTML = `
+                <span class="map-status-item">🌐 ${mapData.length} ACTIVE NODES</span>
+                <span class="map-status-item">🎯 TOP: ${topCountry ? topCountry.name : 'N/A'}</span>
+                <span class="map-status-item">📊 ${total.toLocaleString()} TOTAL VISITS</span>
+            `;
             statusEl.style.color = '#22c55e';
         }
 
