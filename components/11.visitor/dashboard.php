@@ -1,11 +1,15 @@
 <?php
 // ============================================================
-// dashboard.php — Sound Vision Security Analytics Dashboard
-// ENHANCED WITH: Threat scoring, Bot detection, Heatmap,
-//                Referer analysis, Session timeline, Export logs
+// CyberGuard Pro — Advanced Cybersecurity Analytics Platform
+// PROFESSIONAL FEATURES: Threat Intelligence, Bot Detection,
+//                       Traffic Analysis, Security Monitoring,
+//                       Historical Data Analytics, Real-time Alerts
 // ============================================================
 
 define('SV_DASH_PASS', 'soundvision2024');
+
+// Set Bangladesh timezone (UTC+6)
+date_default_timezone_set('Asia/Dhaka');
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -610,37 +614,37 @@ function flag(string $cc): string {
 <!-- ── Sidebar ── -->
 <aside class="db-sidebar">
     <div class="db-logo">
-        <div class="db-logo-icon"><i class="fas fa-chart-line"></i></div>
+        <div class="db-logo-icon"><i class="fas fa-shield-alt"></i></div>
         <div>
-            <div class="db-logo-name">Sound Vision</div>
-            <div class="db-logo-sub">Analytics</div>
+            <div class="db-logo-name">CyberGuard Pro</div>
+            <div class="db-logo-sub">Security Analytics</div>
         </div>
     </div>
 
     <nav class="db-nav">
         <a href="#overview"    class="db-nav-item active" data-section="overview">
-            <i class="fas fa-gauge-high"></i><span>Overview</span>
+            <i class="fas fa-tachometer-alt"></i><span>Threat Overview</span>
         </a>
         <a href="#security"    class="db-nav-item" data-section="security">
-            <i class="fas fa-shield-alt"></i><span>Security Threats</span>
+            <i class="fas fa-exclamation-triangle"></i><span>Security Alerts</span>
         </a>
         <a href="#heatmap"     class="db-nav-item" data-section="heatmap">
-            <i class="fas fa-fire"></i><span>Traffic Heatmap</span>
+            <i class="fas fa-fire"></i><span>Attack Heatmap</span>
         </a>
         <a href="#referers"    class="db-nav-item" data-section="referers">
-            <i class="fas fa-link"></i><span>Referer Analysis</span>
+            <i class="fas fa-external-link-alt"></i><span>Traffic Sources</span>
         </a>
         <a href="#countries"   class="db-nav-item" data-section="countries">
-            <i class="fas fa-earth-asia"></i><span>Countries + Map</span>
+            <i class="fas fa-globe"></i><span>Geographic Intel</span>
         </a>
         <a href="#devices"     class="db-nav-item" data-section="devices">
-            <i class="fas fa-mobile-screen-button"></i><span>Devices</span>
+            <i class="fas fa-mobile-alt"></i><span>Device Analysis</span>
         </a>
         <a href="#visitors"    class="db-nav-item" data-section="visitors">
-            <i class="fas fa-users"></i><span>Visitors Log</span>
+            <i class="fas fa-users"></i><span>Visitor Intelligence</span>
         </a>
         <a href="#iptracker"   class="db-nav-item" data-section="iptracker">
-            <i class="fas fa-network-wired"></i><span>IP Tracker</span>
+            <i class="fas fa-search"></i><span>IP Investigation</span>
         </a>
     </nav>
 
@@ -656,8 +660,8 @@ function flag(string $cc): string {
     <!-- Top Bar -->
     <header class="db-topbar">
         <div class="db-topbar-left">
-            <h1 class="db-page-title">Analytics Overview</h1>
-            <p class="db-page-date">Last updated: <?= date('D, d M Y · H:i') ?></p>
+            <h1 class="db-page-title">CyberGuard Pro Dashboard</h1>
+            <p class="db-page-date">Real-time Security Intelligence · Last updated: <?= date('D, d M Y · H:i') ?> BDT</p>
         </div>
         <div class="db-topbar-right">
             <!-- Month/Year Filter -->
@@ -798,7 +802,7 @@ function flag(string $cc): string {
     <!-- ══════════════════════════════════════════════ -->
     <section class="db-section db-section--hidden" id="security">
         <div class="db-section-header">
-            <h2><i class="fas fa-shield-alt" style="color:#ef4444;margin-right:8px"></i>Security Analysis &amp; Threat Alerts</h2>
+            <h2><i class="fas fa-shield-alt" style="color:#ef4444;margin-right:8px"></i>Advanced Threat Intelligence & Security Alerts</h2>
             <span class="db-stat-pill"><?= count($threatAlerts) ?> threats detected · <?= count($ipThreats) ?> IPs analyzed</span>
         </div>
 
@@ -915,7 +919,7 @@ function flag(string $cc): string {
     <!-- ══════════════════════════════════════════════ -->
     <section class="db-section db-section--hidden" id="heatmap">
         <div class="db-section-header">
-            <h2><i class="fas fa-fire" style="color:#f97316;margin-right:8px"></i>Hourly Traffic Heatmap</h2>
+            <h2><i class="fas fa-fire" style="color:#f97316;margin-right:8px"></i>Real-time Attack Pattern Analysis</h2>
             <span class="db-stat-pill">24-hour distribution</span>
         </div>
 
@@ -963,7 +967,7 @@ function flag(string $cc): string {
     <!-- ══════════════════════════════════════════════ -->
     <section class="db-section db-section--hidden" id="referers">
         <div class="db-section-header">
-            <h2><i class="fas fa-link" style="color:#3b82f6;margin-right:8px"></i>Referer Analysis</h2>
+            <h2><i class="fas fa-link" style="color:#3b82f6;margin-right:8px"></i>Traffic Source Intelligence</h2>
             <span class="db-stat-pill"><?= count($refererData) ?> unique sources</span>
         </div>
 
@@ -1028,7 +1032,7 @@ function flag(string $cc): string {
     <section class="db-section db-section--hidden" id="countries">
 
         <div class="db-section-header">
-            <h2><i class="fas fa-earth-asia" style="color:#3b82f6;margin-right:8px"></i>Countries &amp; World Map</h2>
+            <h2><i class="fas fa-earth-asia" style="color:#3b82f6;margin-right:8px"></i>Global Threat Distribution & Geographic Intelligence</h2>
             <span class="db-stat-pill"><?= count($countries) ?> countries · <?= number_format($totalUnique) ?> visits</span>
         </div>
 
@@ -1049,7 +1053,7 @@ function flag(string $cc): string {
                     </div>
                     <div class="map-hud map-hud-tr">
                         <span class="map-hud-line"><?= date('Y-m-d') ?></span>
-                        <span class="map-hud-line"><?= date('H:i:s') ?> UTC+0</span>
+                        <span class="map-hud-line"><?= date('H:i:s') ?> BDT</span>
                         <span class="map-hud-line">GLOBAL_COVERAGE</span>
                     </div>
                     <div class="map-hud map-hud-bl">
@@ -1230,7 +1234,7 @@ function flag(string $cc): string {
     <!-- ══════════════════════════════════════════════ -->
     <section class="db-section db-section--hidden" id="iptracker">
         <div class="db-section-header">
-            <h2><i class="fas fa-network-wired" style="color:#3b82f6;margin-right:8px"></i>IP Tracker &amp; Session Analysis</h2>
+            <h2><i class="fas fa-network-wired" style="color:#3b82f6;margin-right:8px"></i>IP Forensics & Session Investigation</h2>
             <span class="db-stat-pill"><?= count($ipCounts) ?> unique IPs · <?= count(array_filter($ipThreats, fn($t) => $t['score'] >= 30)) ?> flagged</span>
         </div>
 

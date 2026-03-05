@@ -1,12 +1,15 @@
 <?php
 // ============================================================
-// visitor_counter.php — Sound Vision Visitor Tracker
-// FIX: Counts EVERY page load (not session-gated)
-// FIX: Stores full IP address
+// CyberGuard Pro — Advanced Visitor Intelligence System
+// FEATURES: Real-time Tracking, Geographic Intelligence,
+//          Device Analysis, Threat Detection, Session Management
 // ============================================================
 
 $sv_visitorFile  = __DIR__ . '/data/visitor.txt';
 $sv_userDataFile = __DIR__ . '/data/user-data.txt';
+
+// Set Bangladesh timezone for accurate tracking
+date_default_timezone_set('Asia/Dhaka');
 
 // ── Historical data: save by month/year ──────────────────────────────────
 $sv_yearMonth    = date('Y-m');
@@ -182,7 +185,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
 
         <div class="sv-ribbon-brand">
             <span class="sv-ribbon-dot"></span>
-            <span class="sv-ribbon-brand-text">LIVE STATS</span>
+            <span class="sv-ribbon-brand-text">CYBERGUARD PRO</span>
         </div>
 
         <div class="sv-ribbon-divider"></div>
@@ -192,7 +195,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
             <span class="sv-ribbon-icon">👁️</span>
             <div class="sv-ribbon-stat-body">
                 <span class="sv-ribbon-num" id="svTotalCount"><?= number_format($sv_totalCount) ?></span>
-                <span class="sv-ribbon-lbl">Total Visitors</span>
+                <span class="sv-ribbon-lbl">Total Intelligence Points</span>
             </div>
         </div>
 
@@ -205,7 +208,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
             </span>
             <div class="sv-ribbon-stat-body">
                 <span class="sv-ribbon-num sv-online-num" id="svOnlineCount"><?= $sv_onlineCount ?></span>
-                <span class="sv-ribbon-lbl">Online Now</span>
+                <span class="sv-ribbon-lbl">Active Intelligence</span>
             </div>
         </div>
 
@@ -217,7 +220,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
                 <span class="sv-ribbon-num">
                     <?= $sv_flag ?> <?= $sv_isLocal ? 'Localhost <small style="opacity:.5;font-size:10px">(dev)</small>' : $sv_countryDisp ?>
                 </span>
-                <span class="sv-ribbon-lbl">Your Location</span>
+                <span class="sv-ribbon-lbl">Geographic Intel</span>
             </div>
         </div>
 
