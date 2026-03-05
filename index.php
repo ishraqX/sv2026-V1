@@ -2,17 +2,26 @@
 // Start session for visitor counter
 session_start();
 
-// Simple visitor counter
-$counter_file = 'visitor_count.txt';
-if (!file_exists($counter_file)) {
-    file_put_contents($counter_file, '0');
-}
-$current_count = (int)file_get_contents($counter_file);
-$current_count++;
-file_put_contents($counter_file, $current_count);
-
 // Define base path for includes
 define('BASE_PATH', __DIR__);
+
+// Simple visitor counter with proper locking
+$counter_file = 'visitor_count.txt';
+$current_count = 0;
+
+if (file_exists($counter_file)) {
+    $current_count = (int)trim(file_get_contents($counter_file));
+}
+
+// Only increment if this is a new session visit
+$session_key = 'sv_visited_' . date('Y-m-d');
+if (!isset($_SESSION[$session_key])) {
+    $current_count++;
+    if (file_put_contents($counter_file, $current_count, LOCK_EX) === false) {
+        error_log('Failed to update visitor count');
+    }
+    $_SESSION[$session_key] = true;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,26 +29,44 @@ define('BASE_PATH', __DIR__);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sound Vision - Transforming Lives Through Innovation</title>
-    
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Sound Vision is revolutionizing accessibility through innovative audio solutions. Transforming lives through cutting-edge technology and inclusive design.">
+    <meta name="keywords" content="sound vision, accessibility, audio technology, innovation, inclusive design, assistive technology">
+    <meta name="author" content="Sound Vision Team">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://soundvision.com.bd/">
+    <meta property="og:title" content="Sound Vision - Transforming Lives Through Innovation">
+    <meta property="og:description" content="Revolutionizing accessibility through innovative audio solutions and inclusive design.">
+    <meta property="og:image" content="https://soundvision.com.bd/assets/images/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://soundvision.com.bd/">
+    <meta property="twitter:title" content="Sound Vision - Transforming Lives Through Innovation">
+    <meta property="twitter:description" content="Revolutionizing accessibility through innovative audio solutions and inclusive design.">
+    <meta property="twitter:image" content="https://soundvision.com.bd/assets/images/twitter-image.jpg">
+
+    <!-- Performance & Security -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png">
+
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="components/0.nav/navigation.css">
-    <link rel="stylesheet" href="components/1.hero/hero.css">
-    <link rel="stylesheet" href="components/2.sdg/sdg.css">
-    <link rel="stylesheet" href="components/3.feature/features.css">
-    <link rel="stylesheet" href="components/4.media/video.css">
-    <link rel="stylesheet" href="components/5.team/team.css">
-    <link rel="stylesheet" href="components/6.download/app-download.css">
-    <link rel="stylesheet" href="components/7.about/about.css">
-    <link rel="stylesheet" href="components/8.award/award.css">
-    <link rel="stylesheet" href="components/9.backedby/backedby.css">
-    <link rel="stylesheet" href="components/10.testimonials/testimonials.css">
-    <link rel="stylesheet" href="components/11.visitor/visitor_counter.css">
-    <link rel="stylesheet" href="components/12.footer/footer.css">
-    <link rel="stylesheet" href="assets/css/responsive.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/combined.min.css">
     <link rel="stylesheet" href="assets/css/overflow-fix.css">
     
     
@@ -70,16 +97,19 @@ define('BASE_PATH', __DIR__);
 </head>
 <body>
 
-    <?php 
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <?php
     // Navigation
     if (file_exists('components/0.nav/navigation.php')) include 'components/0.nav/navigation.php';
-    
+
     // Hero Banner
     if (file_exists('components/1.hero/hero.php')) include 'components/1.hero/hero.php';
-    
+
     // SDG Section
     if (file_exists('components/2.sdg/sdg.php')) include 'components/2.sdg/sdg.php';
-    
+
     // Solutions/Features
     if (file_exists('components/3.feature/features.php')) include 'components/3.feature/features.php';
 
@@ -88,23 +118,23 @@ define('BASE_PATH', __DIR__);
 
     // Teams
     if (file_exists('components/5.team/team.php')) include 'components/5.team/team.php';
-    
+
     // App Download
     if (file_exists('components/6.download/app-download.php')) include 'components/6.download/app-download.php';
-    
+
     // Who We Are (About)
     if (file_exists('components/7.about/about.php')) include 'components/7.about/about.php';
-    
+
     // Awards & Achievements
     if (file_exists('components/8.award/award.php')) include 'components/8.award/award.php';
 
     // backedby
     if (file_exists('components/9.backedby/backedby.php')) include 'components/9.backedby/backedby.php';
-    
+
     // Testimonials
     if (file_exists('components/10.testimonials/testimonials.php')) include 'components/10.testimonials/testimonials.php';
-    
-    
+
+
     // Visitor Counter
     if (file_exists('components/11.visitor/visitor_counter.php')) include 'components/11.visitor/visitor_counter.php';
 
@@ -112,13 +142,7 @@ define('BASE_PATH', __DIR__);
     if (file_exists('components/12.footer/footer.php')) include 'components/12.footer/footer.php';
     ?>
 
-    <script src="assets/js/main.js" defer></script>
-    
-    
-    <script src="components/5.team/team.js" defer></script>
-    <script src="components/8.award/award.js" defer></script>
-    <script src="components/8.award/award-music.js"></script>
-    <script src="components/9.backedby/backedby.js"></script>
+    <script src="assets/js/combined.min.js" defer></script>
 
     <script>
         /**
@@ -163,6 +187,9 @@ define('BASE_PATH', __DIR__);
             }
         }, 4000);
     </script>
+
+    <!-- Scripts -->
+    <script src="assets/js/combined.min.js"></script>
 
 </body>
 </html>

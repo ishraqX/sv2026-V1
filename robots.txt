@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Block access to sensitive files
+Disallow: /assets/css/
+Disallow: /assets/js/
+Disallow: /components/
+Disallow: /members/
+Disallow: /error_log
+Disallow: /visitor_count.txt
+Disallow: /cpanel.yml
+
+# Allow access to important assets
+Allow: /assets/images/
+Allow: /assets/css/combined.min.css
+Allow: /assets/js/combined.min.js
+
+# Sitemap
+Sitemap: https://soundvision.com.bd/sitemap.xml

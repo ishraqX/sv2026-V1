@@ -1,38 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sound Vision — See the World in Sound</title>
-
-    <!--
-    ╔══════════════════════════════════════════════════════════╗
-    ║  FONT LOADING — Outfit from Google Fonts                 ║
-    ║  • preconnect speeds up DNS resolution                   ║
-    ║  • display=swap → system font shows IMMEDIATELY,        ║
-    ║    then swaps to Outfit once loaded.                     ║
-    ║  • Fallback stack in CSS: Outfit → Trebuchet MS →        ║
-    ║    Helvetica → Arial → sans-serif                        ║
-    ║  • This combination guarantees text ALWAYS renders,      ║
-    ║    never flattens or goes invisible.                     ║
-    ╚══════════════════════════════════════════════════════════╝
-    -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap">
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="hero.css">
-</head>
-<body>
+<?php
+/**
+ * Hero Section Component
+ * Displays the main hero banner with slider functionality
+ */
+?>
 
 <!-- ══════════════════════════════════════════════════════════
      HERO SECTION
      Text LEFT · Image RIGHT (desktop)
      Image TOP · Text BELOW (mobile — image always visible)
 ══════════════════════════════════════════════════════════ -->
-<section id="hero" aria-label="Sound Vision Hero">
+<section id="hero" aria-label="Sound Vision Hero" role="main">
 
     <div class="hs-track" id="hsTrack">
 
@@ -332,6 +310,4 @@
     </div>
 
 </section>
-<script src="components/1.hero/hero.js" defer></script>
-</body>
 </html>
