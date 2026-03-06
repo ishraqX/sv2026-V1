@@ -1,134 +1,141 @@
-/* ===== TESTIMONIALS.JS - Slider Logic ===== */
+/* ===== TESTIMONIALS.JS ===== */
 
 (function () {
     const AUTOPLAY_MS = 6000;
 
-    const wrapper = document.querySelector('.testimonials-slider-wrapper');
+    const wrapper  = document.querySelector('.testimonials-slider-wrapper');
     if (!wrapper) return;
 
     const slider   = wrapper.querySelector('.testimonials-slider');
-    const cards    = Array.from(document.querySelectorAll('.testimonial-card'));
+    const cards    = Array.from(wrapper.querySelectorAll('.testimonial-card'));
     const prevBtn  = wrapper.querySelector('.testimonial-prev');
     const nextBtn  = wrapper.querySelector('.testimonial-next');
-    const dotsEl   = wrapper.querySelector('.testimonials-dots');
+    const dotsWrap = wrapper.querySelector('.testimonials-dots');
+    const counter  = wrapper.querySelector('.t-counter');
 
     if (!cards.length) return;
 
-    let current   = 0;
-    let timer     = null;
-    let progTimer = null;
-    let progBar   = null;
+    let current = 0;
+    let autoTimer = null;
 
-    /* ── Build dots ──────────────────────────────────────── */
+    /* ── Build dots ──────────────────────────────────────────── */
     cards.forEach((_, i) => {
         const btn = document.createElement('button');
-        btn.className = 'dot' + (i === 0 ? ' active' : '');
-        btn.setAttribute('aria-label', `Go to testimonial ${i + 1}`);
-        btn.addEventListener('click', () => goTo(i, i > current ? 'next' : 'prev'));
-        dotsEl.appendChild(btn);
+        btn.className = 't-dot' + (i === 0 ? ' active' : '');
+        btn.setAttribute('aria-label', 'Go to testimonial ' + (i + 1));
+        btn.addEventListener('click', () => { clearAuto(); goTo(i, i > current ? 'next' : 'prev'); startAuto(); });
+        dotsWrap.appendChild(btn);
     });
 
-    /* ── Build progress bar ──────────────────────────────── */
-    progBar = document.createElement('div');
-    progBar.className = 'testimonial-progress';
-
-    /* inject into first active card */
-    function attachProgress() {
-        const activeCard = cards[current];
-        if (!activeCard.contains(progBar)) activeCard.appendChild(progBar);
-    }
-
-    /* ── Init: show first card ───────────────────────────── */
+    /* ── Init ────────────────────────────────────────────────── */
     cards[0].classList.add('active');
-    attachProgress();
-    startProgress();
-    startAutoplay();
+    updateCounter(0);
+    startProgress(cards[0]);
+    startAuto();
 
-    /* ── Navigation ──────────────────────────────────────── */
-    prevBtn.addEventListener('click', () => { clearTimers(); goTo(prev(current), 'prev'); startAutoplay(); });
-    nextBtn.addEventListener('click', () => { clearTimers(); goTo(next(current), 'next'); startAutoplay(); });
+    /* ── Button listeners ────────────────────────────────────── */
+    prevBtn.addEventListener('click', () => { clearAuto(); goTo(prev(current), 'prev'); startAuto(); });
+    nextBtn.addEventListener('click', () => { clearAuto(); goTo(next(current), 'next'); startAuto(); });
 
-    /* ── Keyboard ────────────────────────────────────────── */
+    /* ── Keyboard ────────────────────────────────────────────── */
     document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft')  { clearTimers(); goTo(prev(current), 'prev'); startAutoplay(); }
-        if (e.key === 'ArrowRight') { clearTimers(); goTo(next(current), 'next'); startAutoplay(); }
+        if (e.key === 'ArrowLeft')  { clearAuto(); goTo(prev(current), 'prev'); startAuto(); }
+        if (e.key === 'ArrowRight') { clearAuto(); goTo(next(current), 'next'); startAuto(); }
     });
 
-    /* ── Touch / swipe ───────────────────────────────────── */
-    let touchStartX = null;
-    slider.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    /* ── Touch swipe ─────────────────────────────────────────── */
+    let tx = null;
+    slider.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
     slider.addEventListener('touchend', e => {
-        if (touchStartX === null) return;
-        const dx = e.changedTouches[0].clientX - touchStartX;
-        touchStartX = null;
+        if (tx === null) return;
+        const dx = e.changedTouches[0].clientX - tx;
+        tx = null;
         if (Math.abs(dx) < 40) return;
-        clearTimers();
-        if (dx < 0) goTo(next(current), 'next');
-        else        goTo(prev(current), 'prev');
-        startAutoplay();
+        clearAuto();
+        dx < 0 ? goTo(next(current), 'next') : goTo(prev(current), 'prev');
+        startAuto();
     });
 
-    /* ── Pause on hover ──────────────────────────────────── */
-    wrapper.addEventListener('mouseenter', clearTimers);
-    wrapper.addEventListener('mouseleave', () => { clearTimers(); startAutoplay(); });
+    /* ── Pause on hover ──────────────────────────────────────── */
+    wrapper.addEventListener('mouseenter', clearAuto);
+    wrapper.addEventListener('mouseleave', () => { clearAuto(); startAuto(); });
 
-    /* ── Core transition ─────────────────────────────────── */
-    function goTo(idx, direction) {
+    /* ── Core transition ─────────────────────────────────────── */
+    function goTo(idx, dir) {
         if (idx === current) return;
 
         const outCard = cards[current];
         const inCard  = cards[idx];
-        const dots    = dotsEl.querySelectorAll('.dot');
+        const dots    = dotsWrap.querySelectorAll('.t-dot');
 
-        /* exit animation */
+        /* stop outgoing progress */
+        const outProg = outCard.querySelector('.testimonial-progress');
+        if (outProg) { outProg.style.transition = 'none'; outProg.style.width = '0%'; }
+
+        /* exit */
         outCard.classList.remove('active');
-        outCard.classList.add(direction === 'next' ? 'exit-left' : 'exit-right');
+        outCard.classList.add(dir === 'next' ? 'exit-left' : 'exit-right');
 
-        /* reset enter card position */
-        inCard.style.transform = direction === 'next' ? 'translateX(60px) scale(0.97)' : 'translateX(-60px) scale(0.97)';
-        inCard.style.opacity   = '0';
+        /* position entering card off-screen */
+        inCard.style.transform = dir === 'next' ? 'translateX(50px)' : 'translateX(-50px)';
+        inCard.style.opacity = '0';
+        void inCard.offsetWidth; /* reflow */
 
-        /* force reflow then activate */
-        void inCard.offsetWidth;
         inCard.classList.add('active');
         inCard.style.transform = '';
-        inCard.style.opacity   = '';
+        inCard.style.opacity = '';
 
-        /* clean up exit card after transition */
         outCard.addEventListener('transitionend', () => {
             outCard.classList.remove('exit-left', 'exit-right');
         }, { once: true });
 
-        /* update dots */
+        /* update dots + counter */
         dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-
         current = idx;
-
-        /* move progress bar */
-        attachProgress();
-        startProgress();
+        updateCounter(idx);
+        startProgress(inCard);
     }
 
-    /* ── Helpers ─────────────────────────────────────────── */
+    function startProgress(card) {
+        const bar = card.querySelector('.testimonial-progress');
+        if (!bar) return;
+        bar.style.transition = 'none';
+        bar.style.width = '0%';
+        void bar.offsetWidth;
+        bar.style.transition = 'width ' + AUTOPLAY_MS + 'ms linear';
+        bar.style.width = '100%';
+    }
+
+    function updateCounter(idx) {
+        if (!counter) return;
+        const pad = n => String(n).padStart(2, '0');
+        counter.textContent = pad(idx + 1) + ' / ' + pad(cards.length);
+    }
+
     function next(i) { return (i + 1) % cards.length; }
     function prev(i) { return (i - 1 + cards.length) % cards.length; }
 
-    function clearTimers() {
-        clearInterval(timer);
-        clearTimeout(progTimer);
-        if (progBar) { progBar.style.transition = 'none'; progBar.style.width = '0%'; }
+    function clearAuto() {
+        clearInterval(autoTimer);
+        /* freeze current progress bar */
+        const bar = cards[current].querySelector('.testimonial-progress');
+        if (bar) {
+            const w = bar.getBoundingClientRect().width;
+            const pw = bar.parentElement.getBoundingClientRect().width;
+            bar.style.transition = 'none';
+            bar.style.width = (w / pw * 100) + '%';
+        }
     }
 
-    function startAutoplay() {
-        timer = setInterval(() => goTo(next(current), 'next'), AUTOPLAY_MS);
-    }
-
-    function startProgress() {
-        if (!progBar) return;
-        progBar.style.transition = 'none';
-        progBar.style.width = '0%';
-        void progBar.offsetWidth; /* reflow */
-        progBar.style.transition = `width ${AUTOPLAY_MS}ms linear`;
-        progBar.style.width = '100%';
+    function startAuto() {
+        /* resume progress */
+        const bar = cards[current].querySelector('.testimonial-progress');
+        if (bar) {
+            void bar.offsetWidth;
+            const remaining = AUTOPLAY_MS * (1 - parseFloat(bar.style.width) / 100);
+            bar.style.transition = 'width ' + Math.max(remaining, 0) + 'ms linear';
+            bar.style.width = '100%';
+        }
+        autoTimer = setInterval(() => goTo(next(current), 'next'), AUTOPLAY_MS);
     }
 })();
