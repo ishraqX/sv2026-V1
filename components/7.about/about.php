@@ -8,11 +8,29 @@ $file_exists = file_exists($local_path) && is_readable($local_path);
 
 <section class="about-section" id="about">
     <div class="container">
+        <!-- About image: using the actual file in this component folder -->
+        <?php if (!$file_exists): ?>
         
+        <?php endif; ?>
 
         <div class="about-wrapper">
             <div class="about-image">
+                <!-- Try multiple image sources with fallbacks -->
+                <img
+                    src="<?= htmlspecialchars($image_src) ?>"
+                    alt="Sound Vision Team"
+                    onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22400%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%230d1220%22/%3E%3Ctext x=%2250%25%22 y=%2246%25%22 font-family=%22sans-serif%22 font-size=%2222%22 fill=%22%23D4AF37%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3ESound Vision Team%3C/text%3E%3Ctext x=%2250%25%22 y=%2256%25%22 font-family=%22sans-serif%22 font-size=%2213%22 fill=%22%237A6F5A%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3EImage not found%3C/text%3E%3C/svg%3E'; console.log('Image failed to load: ' + this.src);"
+                    style="max-width:100%; border: <?= $file_exists ? '2px solid green' : '2px solid red' ?>;"
+                >
                 
+                <!-- Show base64 if file exists but not loading -->
+                <?php if ($file_exists && $is_readable && $file_size > 0): ?>
+                
+                <?php elseif ($file_exists && !$is_readable): ?>
+                
+                <?php elseif (!$file_exists): ?>
+                
+                <?php endif; ?>
                 
                 <div class="about-stats">
                     <div class="stat-card">
