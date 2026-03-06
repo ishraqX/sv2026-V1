@@ -6681,7 +6681,7 @@ a.sv-bb-logo-wrap { cursor: pointer; }
 .testimonials-slider {
     position: relative;
     overflow: hidden;
-    min-height: 260px;
+    min-height: 0; /* let active card define height naturally */
 }
 
 .testimonial-card {
@@ -6707,6 +6707,7 @@ a.sv-bb-logo-wrap { cursor: pointer; }
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
+    position: relative; /* makes slider auto-size to card height */
 }
 
 .testimonial-card.exit-left {
