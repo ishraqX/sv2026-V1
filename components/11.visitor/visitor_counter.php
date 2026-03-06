@@ -185,7 +185,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
 
         <div class="sv-ribbon-brand">
             <span class="sv-ribbon-dot"></span>
-            <span class="sv-ribbon-brand-text">CYBERGUARD PRO</span>
+            <span class="sv-ribbon-brand-text">Live</span>
         </div>
 
         <div class="sv-ribbon-divider"></div>
@@ -195,7 +195,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
             <span class="sv-ribbon-icon">👁️</span>
             <div class="sv-ribbon-stat-body">
                 <span class="sv-ribbon-num" id="svTotalCount"><?= number_format($sv_totalCount) ?></span>
-                <span class="sv-ribbon-lbl">Total Intelligence Points</span>
+                <span class="sv-ribbon-lbl">Total Visitors</span>
             </div>
         </div>
 
@@ -208,7 +208,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
             </span>
             <div class="sv-ribbon-stat-body">
                 <span class="sv-ribbon-num sv-online-num" id="svOnlineCount"><?= $sv_onlineCount ?></span>
-                <span class="sv-ribbon-lbl">Active Intelligence</span>
+                <span class="sv-ribbon-lbl">Online Now</span>
             </div>
         </div>
 
@@ -220,7 +220,7 @@ $sv_showDash = $sv_isLocal || !empty($_SESSION['sv_admin']);
                 <span class="sv-ribbon-num">
                     <?= $sv_flag ?> <?= $sv_isLocal ? 'Localhost <small style="opacity:.5;font-size:10px">(dev)</small>' : $sv_countryDisp ?>
                 </span>
-                <span class="sv-ribbon-lbl">Geographic Intel</span>
+                <span class="sv-ribbon-lbl">Your Location</span>
             </div>
         </div>
 
