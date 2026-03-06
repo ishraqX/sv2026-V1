@@ -4,9 +4,10 @@
             <h2>What Our Users Say</h2>
             <p>Real stories from real people making a difference</p>
         </div>
-        
+
         <div class="testimonials-slider-wrapper">
             <div class="testimonials-slider">
+
                 <!-- Testimonial 1 -->
                 <div class="testimonial-card">
                     <div class="testimonial-header">
@@ -14,23 +15,21 @@
                             <img src="components/10.testimonials/images/safayet.png" alt="Md.Safayet Hossain">
                         </div>
                         <div class="testimonial-info">
-                            <h4>Md.Safayet Hossain</h4>
+                            <h4>Md. Safayet Hossain</h4>
                             <p>Associate Professor</p>
                             <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
                     </div>
                     <div class="testimonial-content">
                         <i class="fas fa-quote-left quote-icon"></i>
-                        <p>“Go ahead for startup. This is a great innovation that could really make a difference in people's lives.”</p>
+                        <p>"Go ahead for startup. This is a great innovation that could really make a difference in people's lives."</p>
                     </div>
                 </div>
-                
+
                 <!-- Testimonial 2 -->
                 <div class="testimonial-card">
                     <div class="testimonial-header">
@@ -39,12 +38,10 @@
                         </div>
                         <div class="testimonial-info">
                             <h4>Mr. Al Imtiaz</h4>
-                            <p>Associate Professor & Head</p>
+                            <p>Associate Professor &amp; Head</p>
                             <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
@@ -54,7 +51,7 @@
                         <p>"We are proud of you all. Go ahead."</p>
                     </div>
                 </div>
-                
+
                 <!-- Testimonial 3 -->
                 <div class="testimonial-card">
                     <div class="testimonial-header">
@@ -65,20 +62,18 @@
                             <h4>Sabbir Howlader</h4>
                             <p>Lecturer of Chemistry</p>
                             <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
                     </div>
                     <div class="testimonial-content">
                         <i class="fas fa-quote-left quote-icon"></i>
-                        <p>"ভালো কিছু করতে হলে বুয়েট এ পড়া লাগেনা."</p>
+                        <p>"ভালো কিছু করতে হলে বুয়েট এ পড়া লাগেনা."</p>
                     </div>
                 </div>
-                
+
                 <!-- Testimonial 4 -->
                 <div class="testimonial-card">
                     <div class="testimonial-header">
@@ -89,10 +84,8 @@
                             <h4>Ms. Sultana Rokeya Nahar</h4>
                             <p>Assistant Professor</p>
                             <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
@@ -102,7 +95,7 @@
                         <p>"This is a life-changing innovation."</p>
                     </div>
                 </div>
-                
+
                 <!-- Testimonial 5 -->
                 <div class="testimonial-card">
                     <div class="testimonial-header">
@@ -113,10 +106,8 @@
                             <h4>Dr. Md. Abu Hashan Bhuiyan</h4>
                             <p>Professor</p>
                             <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
@@ -126,7 +117,7 @@
                         <p>"A great humanitarian milestone. Congratulations to the team, and best wishes for global success."</p>
                     </div>
                 </div>
-                
+
                 <!-- Testimonial 6 -->
                 <div class="testimonial-card">
                     <div class="testimonial-header">
@@ -135,12 +126,10 @@
                         </div>
                         <div class="testimonial-info">
                             <h4>Mr. Monjur Mohammad Shahriar</h4>
-                            <p>Project Director - DEIED</p>
+                            <p>Project Director — DEIED</p>
                             <div class="testimonial-rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
@@ -150,15 +139,26 @@
                         <p>"SOUND VISION একজন অন্ধ মানুষের জীবনকে সহজ করে।"</p>
                     </div>
                 </div>
-            </div>
-           
+
+            </div><!-- /.testimonials-slider -->
+
             <!-- Navigation -->
             <div class="testimonials-nav">
-                <button class="testimonial-prev"><i class="fas fa-chevron-left"></i></button>
-                <button class="testimonial-next"><i class="fas fa-chevron-right"></i></button>
+                <button class="testimonial-prev" aria-label="Previous testimonial">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="testimonials-dots"></div>
+                <button class="testimonial-next" aria-label="Next testimonial">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
-        </div>
+
+        </div><!-- /.testimonials-slider-wrapper -->
     </div>
 </section>
+
+<!-- Link stylesheet and script in your main file: -->
+<!-- <link rel="stylesheet" href="components/10.testimonials/testimonials.css"> -->
+<!-- <script src="components/10.testimonials/testimonials.js" defer></script> -->
 
 <script src="components/10.testimonials/testimonials.js"></script>
