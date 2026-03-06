@@ -38,7 +38,7 @@ function sv_bb_src(string $base, string $file): string {
 
 $sv_bb_count = count($sv_backed_by);
 ?>
-<link rel="stylesheet" href="components/backedby/backedby.css">
+<link rel="stylesheet" href="components/9.backedby/backedby.css">
 
 <section class="sv-bb-section" id="svBbSection" aria-label="Our Partners and Backers">
 
@@ -130,4 +130,4 @@ $sv_bb_count = count($sv_backed_by);
     </div><!-- /container -->
 </section>
 
-<script src="components/backedby/backedby.js"></script>
+<script src="components/9.backedby/backedby.js"></script>
