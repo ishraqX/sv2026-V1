@@ -66,8 +66,9 @@ if (!isset($_SESSION[$session_key])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="assets/css/combined.min.css">
+    <link rel="stylesheet" href="assets/css/combined.css">
     <link rel="stylesheet" href="assets/css/overflow-fix.css">
+    <link rel="stylesheet" href="components/10.testimonials/testimonials.css">
     
     
 
@@ -142,7 +143,7 @@ if (!isset($_SESSION[$session_key])) {
     if (file_exists('components/12.footer/footer.php')) include 'components/12.footer/footer.php';
     ?>
 
-    <script src="assets/js/combined.min.js" defer></script>
+    <script src="assets/js/combined.js" defer></script>
 
     <script>
         /**
