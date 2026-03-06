@@ -46,7 +46,7 @@ function tm_svg(string $net): string {
 
     <div class="sv-tm-bg" aria-hidden="true">
         <div class="sv-tm-bg-glow sv-tm-bg-glow--a"></div>
-        <div class="sv-tm-bg-glow sv-tm-bg-glow--b"></div>me
+        <div class="sv-tm-bg-glow sv-tm-bg-glow--b"></div>
         <div class="sv-tm-bg-glow sv-tm-bg-glow--c"></div>
         <div class="sv-tm-bg-grid"></div>
         <div class="sv-tm-particles" id="svTmParticles"></div>
