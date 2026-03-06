@@ -19,46 +19,55 @@
     let autoTimer = null;
 
     /* ── Build dots ──────────────────────────────────────────── */
-    cards.forEach((_, i) => {
-        const btn = document.createElement('button');
-        btn.className = 't-dot' + (i === 0 ? ' active' : '');
-        btn.setAttribute('aria-label', 'Go to testimonial ' + (i + 1));
-        btn.addEventListener('click', () => { clearAuto(); goTo(i, i > current ? 'next' : 'prev'); startAuto(); });
-        dotsWrap.appendChild(btn);
-    });
+    if (dotsWrap) {
+        cards.forEach((_, i) => {
+            const btn = document.createElement('button');
+            btn.className = 't-dot' + (i === 0 ? ' active' : '');
+            btn.setAttribute('aria-label', 'Go to testimonial ' + (i + 1));
+            btn.addEventListener('click', () => { clearAuto(); goTo(i, i > current ? 'next' : 'prev'); startAuto(); });
+            dotsWrap.appendChild(btn);
+        });
+    }
 
     /* ── Init ────────────────────────────────────────────────── */
-    cards[0].classList.add('active');
-    updateCounter(0);
-    startProgress(cards[0]);
-    startAuto();
+    if (cards.length > 0) {
+        cards[0].classList.add('active');
+        updateCounter(0);
+        startProgress(cards[0]);
+        startAuto();
+    }
 
     /* ── Button listeners ────────────────────────────────────── */
-    prevBtn.addEventListener('click', () => { clearAuto(); goTo(prev(current), 'prev'); startAuto(); });
-    nextBtn.addEventListener('click', () => { clearAuto(); goTo(next(current), 'next'); startAuto(); });
+    if (prevBtn) prevBtn.addEventListener('click', () => { clearAuto(); goTo(prev(current), 'prev'); startAuto(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { clearAuto(); goTo(next(current), 'next'); startAuto(); });
 
     /* ── Keyboard ────────────────────────────────────────────── */
     document.addEventListener('keydown', e => {
+        if (!wrapper.contains(document.activeElement) && document.activeElement !== document.body) return;
         if (e.key === 'ArrowLeft')  { clearAuto(); goTo(prev(current), 'prev'); startAuto(); }
         if (e.key === 'ArrowRight') { clearAuto(); goTo(next(current), 'next'); startAuto(); }
     });
 
     /* ── Touch swipe ─────────────────────────────────────────── */
     let tx = null;
-    slider.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-    slider.addEventListener('touchend', e => {
-        if (tx === null) return;
-        const dx = e.changedTouches[0].clientX - tx;
-        tx = null;
-        if (Math.abs(dx) < 40) return;
-        clearAuto();
-        dx < 0 ? goTo(next(current), 'next') : goTo(prev(current), 'prev');
-        startAuto();
-    });
+    if (slider) {
+        slider.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+        slider.addEventListener('touchend', e => {
+            if (tx === null) return;
+            const dx = e.changedTouches[0].clientX - tx;
+            tx = null;
+            if (Math.abs(dx) < 40) return;
+            clearAuto();
+            dx < 0 ? goTo(next(current), 'next') : goTo(prev(current), 'prev');
+            startAuto();
+        });
+    }
 
     /* ── Pause on hover ──────────────────────────────────────── */
-    wrapper.addEventListener('mouseenter', clearAuto);
-    wrapper.addEventListener('mouseleave', () => { clearAuto(); startAuto(); });
+    if (wrapper) {
+        wrapper.addEventListener('mouseenter', clearAuto);
+        wrapper.addEventListener('mouseleave', () => { clearAuto(); startAuto(); });
+    }
 
     /* ── Core transition ─────────────────────────────────────── */
     function goTo(idx, dir) {
@@ -66,7 +75,6 @@
 
         const outCard = cards[current];
         const inCard  = cards[idx];
-        const dots    = dotsWrap.querySelectorAll('.t-dot');
 
         /* stop outgoing progress */
         const outProg = outCard.querySelector('.testimonial-progress');
@@ -90,7 +98,10 @@
         }, { once: true });
 
         /* update dots + counter */
-        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        if (dotsWrap) {
+            const dots = dotsWrap.querySelectorAll('.t-dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        }
         current = idx;
         updateCounter(idx);
         startProgress(inCard);

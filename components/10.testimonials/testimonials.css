@@ -131,12 +131,17 @@
     opacity: 1;
     transform: translateX(0);
     pointer-events: auto;
-    position: relative;
 }
 
 .testimonial-card.exit-left {
     opacity: 0;
     transform: translateX(-50px);
+    pointer-events: none;
+}
+
+.testimonial-card.exit-right {
+    opacity: 0;
+    transform: translateX(50px);
     pointer-events: none;
 }
 
