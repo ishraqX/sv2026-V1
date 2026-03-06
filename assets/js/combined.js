@@ -91,55 +91,6 @@ indicators.forEach((indicator, index) => {
     });
 });
 
-// ===== TESTIMONIALS SLIDER =====
-let currentTestimonial = 0;
-const testimonialCards = document.querySelectorAll('.testimonial-card');
-const testimonialNext = document.querySelector('.testimonial-next');
-const testimonialPrev = document.querySelector('.testimonial-prev');
-
-function showTestimonial(index) {
-    testimonialCards.forEach((card, i) => {
-        card.style.display = i === index ? 'block' : 'none';
-    });
-}
-
-function nextTestimonial() {
-    currentTestimonial = (currentTestimonial + 1) % testimonialCards.length;
-    showTestimonial(currentTestimonial);
-}
-
-function prevTestimonial() {
-    currentTestimonial = (currentTestimonial - 1 + testimonialCards.length) % testimonialCards.length;
-    showTestimonial(currentTestimonial);
-}
-
-// Initialize testimonials
-if (testimonialCards.length > 0) {
-    showTestimonial(0);
-}
-
-if (testimonialNext) {
-    testimonialNext.addEventListener('click', nextTestimonial);
-}
-
-if (testimonialPrev) {
-    testimonialPrev.addEventListener('click', prevTestimonial);
-}
-
-// Auto rotate testimonials
-let testimonialInterval = setInterval(nextTestimonial, 7000);
-
-// Pause on hover
-const testimonialsSlider = document.querySelector('.testimonials-slider');
-if (testimonialsSlider) {
-    testimonialsSlider.addEventListener('mouseenter', () => {
-        clearInterval(testimonialInterval);
-    });
-    
-    testimonialsSlider.addEventListener('mouseleave', () => {
-        testimonialInterval = setInterval(nextTestimonial, 7000);
-    });
-}
 
 // ===== SCROLL ANIMATIONS =====
 const observerOptions = {
