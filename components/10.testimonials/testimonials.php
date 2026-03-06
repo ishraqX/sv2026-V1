@@ -102,8 +102,8 @@
                         <p>"This is a life-changing innovation."</p>
                     </div>
                 </div>
-            </div>
-            <!-- Testimonial 5 -->
+                
+                <!-- Testimonial 5 -->
                 <div class="testimonial-card">
                     <div class="testimonial-header">
                         <div class="testimonial-avatar">
@@ -126,8 +126,8 @@
                         <p>"A great humanitarian milestone. Congratulations to the team, and best wishes for global success."</p>
                     </div>
                 </div>
-            </div>
-             <!-- Testimonial 6 -->
+                
+                <!-- Testimonial 6 -->
                 <div class="testimonial-card">
                     <div class="testimonial-header">
                         <div class="testimonial-avatar">
@@ -160,3 +160,5 @@
         </div>
     </div>
 </section>
+
+<script src="components/10.testimonials/testimonials.js"></script>
